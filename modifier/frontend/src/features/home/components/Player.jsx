@@ -10,17 +10,25 @@ import {
 } from "lucide-react";
 
 import "../../home/style/Player.scss";
-import {useContext} from "react"
-import {MusicContext} from "../MusicContext"
-
+import { useContext } from "react";
 
 const Player = () => {
   const { song } = useSong();
   const audioRef = useRef(null);
-const {addFavorite} = useContext(MusicContext)
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [volume, setVolume] = useState(0.7);
+
+  useEffect(() => {
+    if (song) {
+      setIsPlaying(false);
+      setProgress(0);
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+      }
+    }
+  }, [song]);
 
   useEffect(() => {
     if (audioRef.current) audioRef.current.volume = volume;
@@ -40,15 +48,13 @@ const {addFavorite} = useContext(MusicContext)
   const handleTimeUpdate = () => {
     const current = audioRef.current.currentTime;
     const duration = audioRef.current.duration;
-
     setProgress((current / duration) * 100 || 0);
   };
 
   const seek = (e) => {
     const rect = e.currentTarget.getBoundingClientRect();
     const percent = (e.clientX - rect.left) / rect.width;
-    audioRef.current.currentTime =
-      percent * audioRef.current.duration;
+    audioRef.current.currentTime = percent * audioRef.current.duration;
   };
 
   const format = (sec) => {
@@ -68,7 +74,6 @@ const {addFavorite} = useContext(MusicContext)
 
   return (
     <div className="player">
-
       <audio
         ref={audioRef}
         src={song.url}
@@ -78,27 +83,21 @@ const {addFavorite} = useContext(MusicContext)
 
       {/* LEFT */}
       <div className="player-left">
-
         <img
           src={song.posterUrl || "/default-cover.png"}
           alt="cover"
           className="cover"
         />
-
         <div className="meta">
           <p className="title">{song.title}</p>
           <p className="mood">{song.mood}</p>
         </div>
-
-       <Heart className="like" size={18} onClick={()=>addFavorite(song)}/>
-
+        <Heart className="like" size={18} />
       </div>
 
       {/* CENTER */}
       <div className="player-center">
-
         <div className="controls">
-
           <Shuffle size={18} />
 
           <button onClick={back5}>
@@ -116,29 +115,21 @@ const {addFavorite} = useContext(MusicContext)
           </button>
 
           <Repeat size={18} />
-
         </div>
 
         <div className="progress-wrapper">
-
           <span>{format(audioRef.current?.currentTime)}</span>
 
           <div className="progress" onClick={seek}>
-            <div
-              className="progress-fill"
-              style={{ width: `${progress}%` }}
-            />
+            <div className="progress-fill" style={{ width: `${progress}%` }} />
           </div>
 
           <span>{format(audioRef.current?.duration)}</span>
-
         </div>
-
       </div>
 
       {/* RIGHT */}
       <div className="player-right">
-
         <Volume2 size={18} />
 
         <input
@@ -147,13 +138,9 @@ const {addFavorite} = useContext(MusicContext)
           max="1"
           step="0.01"
           value={volume}
-          onChange={(e) =>
-            setVolume(parseFloat(e.target.value))
-          }
+          onChange={(e) => setVolume(parseFloat(e.target.value))}
         />
-
       </div>
-
     </div>
   );
 };

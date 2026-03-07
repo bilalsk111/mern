@@ -18,180 +18,180 @@ $dim: var(--dim);
 
 /* LEFT */
 
-.player-left{
+.player-left {
 
-flex:1;
-display:flex;
-align-items:center;
-gap:12px;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
 
-.cover{
-width:52px;
-height:52px;
-border-radius:4px;
-object-fit:cover;
-}
+  .cover {
+    width: 52px;
+    height: 52px;
+    border-radius: 4px;
+    object-fit: cover;
+  }
 
-.meta{
-display:flex;
-flex-direction:column;
+  .meta {
+    display: flex;
+    flex-direction: column;
 
-.title{
-color:$text;
-font-size:14px;
-max-width:200px;
-white-space:nowrap;
-overflow:hidden;
-text-overflow:ellipsis;
-}
+    .title {
+      color: $text;
+      font-size: 14px;
+      max-width: 200px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
 
-.mood{
-color:$dim;
-font-size:11px;
-}
-}
+    .mood {
+      color: $dim;
+      font-size: 11px;
+    }
+  }
 
-.like{
-color:$dim;
-cursor:pointer;
+  .like {
+    color: $dim;
+    cursor: pointer;
 
-&:hover{
-color:$text;
-}
-}
+    &:hover {
+      color: $text;
+    }
+  }
 
 }
 
 /* CENTER */
 
-.player-center{
+.player-center {
 
-flex:2;
-display:flex;
-flex-direction:column;
-align-items:center;
-gap:6px;
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
 
-.controls{
+  .controls {
 
-display:flex;
-align-items:center;
-gap:20px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
 
-svg{
-color:$dim;
-cursor:pointer;
+    svg {
+      color: $dim;
+      cursor: pointer;
 
-&:hover{
-color:$text;
-}
-}
+      &:hover {
+        color: $text;
+      }
+    }
 
-button{
-background:none;
-border:none;
-color:$dim;
-display:flex;
-align-items:center;
-gap:3px;
-cursor:pointer;
-}
+    button {
+      background: none;
+      border: none;
+      color: $dim;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      cursor: pointer;
+    }
 
-.play{
-width:42px;
-height:42px;
-border-radius:50%;
-background:white;
-color:black;
-font-size:18px;
-display:flex;
-align-items:center;
-justify-content:center;
-}
+    .play {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: white;
+      color: black;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
 
-}
+  }
 
-.progress-wrapper{
+  .progress-wrapper {
 
-width:100%;
-display:flex;
-align-items:center;
-gap:10px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 
-span{
-font-size:11px;
-color:$dim;
-width:35px;
-text-align:center;
-}
+    span {
+      font-size: 11px;
+      color: $dim;
+      width: 35px;
+      text-align: center;
+    }
 
-.progress{
+    .progress {
 
-flex:1;
-height:6px;
-background:var(--input-border);
-border-radius:5px;
-cursor:pointer;
+      flex: 1;
+      height: 6px;
+      background: var(--input-border);
+      border-radius: 5px;
+      cursor: pointer;
 
-}
+    }
 
-.progress-fill{
-height:100%;
-background:$green;
-border-radius:5px;
-}
+    .progress-fill {
+      height: 100%;
+      background: $green;
+      border-radius: 5px;
+    }
 
-}
+  }
 
 }
 
 /* RIGHT */
 
-.player-right{
+.player-right {
 
-flex:1;
-display:flex;
-justify-content:flex-end;
-align-items:center;
-gap:10px;
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
 
-input{
-width:110px;
-accent-color:$green;
-}
+  input {
+    width: 110px;
+    accent-color: $green;
+  }
 
 }
 
 /* MOBILE */
 
-@media(max-width:768px){
+@media(max-width:768px) {
 
-.player{
-flex-direction:column;
-height:auto;
-padding:10px;
-gap:10px;
-}
+  .player {
+    flex-direction: column;
+    height: auto;
+    padding: 10px;
+    gap: 10px;
+  }
 
-.player-left{
-width:100%;
-}
+  .player-left {
+    width: 100%;
+  }
 
-.player-center{
-width:100%;
-}
+  .player-center {
+    width: 100%;
+  }
 
-.player-right{
-display:none;
-}
+  .player-right {
+    display: none;
+  }
 
-.controls{
-gap:16px;
-}
+  .controls {
+    gap: 16px;
+  }
 
-.progress-wrapper span{
-display:none;
-}
+  .progress-wrapper span {
+    display: none;
+  }
 
 }
 
@@ -201,13 +201,16 @@ display:none;
   backdrop-filter: blur(20px);
   border-top: 1px solid var(--input-border);
   padding: 0 40px;
-  
+
   .play {
     background: var(--text-main) !important;
     color: var(--auth-bg) !important;
-    &:hover { transform: scale(1.1); }
+
+    &:hover {
+      transform: scale(1.1);
+    }
   }
-  
+
   .progress-fill {
     background: var(--link-color) !important;
     box-shadow: 0 0 10px var(--link-color);

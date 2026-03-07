@@ -1,0 +1,200 @@
+.navbar-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  padding: 20px 8%;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &.scrolled {
+    padding: 12px 8%;
+    background: rgba(var(--bg), 0.7);
+    backdrop-filter: var(--glass);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .navbar-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  // --- LOGO ---
+  .nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    color: var(--text);
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+
+    .logo-icon {
+      background: var(--story-gradient);
+      padding: 8px;
+      border-radius: 10px;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 15px rgba(240, 148, 51, 0.3);
+    }
+  }
+
+  // --- DESKTOP LINKS ---
+  .nav-links-desktop {
+    display: flex;
+    gap: 32px;
+    align-items: center;
+
+    .nav-link {
+      text-decoration: none;
+      color: var(--dim);
+      font-size: 14px;
+      font-weight: 500;
+      transition: 0.3s;
+
+      &:hover { color: var(--text); }
+
+      &.premium {
+        color: var(--accent);
+        background: rgba(var(--accent), 0.1);
+        padding: 4px 12px;
+        border-radius: 6px;
+        border: 1px solid rgba(var(--accent), 0.2);
+      }
+    }
+  }
+
+  // --- ACTIONS ---
+  .nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+
+    .search-btn {
+      background: transparent;
+      border: none;
+      color: var(--dim);
+      cursor: pointer;
+      &:hover { color: var(--text); }
+    }
+
+    .auth-group {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+
+      .login-link {
+        text-decoration: none;
+        color: var(--text);
+        font-weight: 600;
+        font-size: 14px;
+      }
+
+      .signup-btn {
+        background: var(--text-main);
+        color: var(--auth-bg);
+        padding: 10px 20px;
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 14px;
+        transition: 0.3s;
+        &:hover { opacity: 0.9; transform: translateY(-1px); }
+      }
+    }
+
+    .mobile-toggle {
+      display: none;
+      background: transparent;
+      border: none;
+      color: var(--text);
+      cursor: pointer;
+    }
+  }
+}
+.mobile-menu{
+    display: none;
+}
+// --- MOBILE RESPONSIVENESS FIX ---
+@media (max-width: 992px) {
+  .nav-links-desktop, .auth-group { 
+    display: none !important; 
+  }
+  
+  .navbar-wrapper .nav-actions .mobile-toggle { 
+    display: block; 
+    z-index: 1001;
+  }
+
+  .mobile-menu {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 85%;
+    max-width: 320px;
+    height: 100vh;
+    background: rgba(18, 18, 18, 0.95); 
+    backdrop-filter: blur(25px) saturate(180%);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 120px 40px 60px;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+    z-index: 1000;
+
+    &.open { 
+      right: 0; 
+      box-shadow: -20px 0 50px rgba(0, 0, 0, 0.5);
+    }
+
+    .mobile-menu-links {
+      display: flex;
+      flex-direction: column;
+      gap: 35px;
+      a {
+        text-decoration: none;
+        color: #ffffff;
+        font-size: 20px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        transition: 0.3s;
+        
+        &:hover {
+          color: var(--accent);
+          transform: translateX(10px);
+        }
+      }
+    }
+
+    .mobile-menu-auth {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      padding-top: 40px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+
+      .mobile-auth {
+        text-align: center;
+        color: #ffffff;
+        font-weight: 500;
+      }
+
+      .mobile-signup {
+        background: var(--story-gradient); 
+        color: #ffffff;
+        padding: 16px;
+        text-align: center;
+        border-radius: 12px;
+        font-weight: 700;
+        box-shadow: 0 10px 20px rgba(230, 104, 60, 0.2);
+      }
+    }
+  }
+}

@@ -1,4 +1,3 @@
-// User schema (secure password + unique fields)
 const mongoose = require('mongoose')
 
 const userSchema = new mongoose.Schema({

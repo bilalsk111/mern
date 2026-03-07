@@ -1,3 +1,4 @@
+const favModel = require("../models/fav.model")
 const songModel = require("../models/song.model")
 const storageService = require("../services/storage.service")
 const id3 = require("node-id3")
@@ -48,19 +49,67 @@ async function uploadSong(req, res) {
     }
 }
 async function getSong(req, res) {
+    try {
+        const { mood } = req.query;
+        let query = {};
+        if (mood && mood !== 'all') {
+            query.mood = mood.toLowerCase();
+        }
+        const songs = await songModel.find(query);
 
-    const { mood } = req.query
+        if (!songs || songs.length === 0) {
+            return res.status(404).json({ message: "No songs found for this mood." });
+        }
 
-    const song = await songModel.findOne({
-        mood,
-    })
+        res.status(200).json({
+            message: "songs fetched successfully.",
+            songs,
+        });
+    } catch (err) {
+        res.status(500).json({ message: "Server Error", error: err.message });
+    }
+}
+const toggleFav = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const songId = req.params.id;
+        if (!userId || !songId) {
+            return res.status(400).json({
+                message: "User or Song ID missing",
+                received: { userId, songId }
+            });
+        }
 
-    res.status(200).json({
-        message: "song fetched successfully.",
-        song,
-    })
+        const existingFav = await favModel.findOne({ user: userId, song: songId });
 
+        if (existingFav) {
+            await favModel.deleteOne({ _id: existingFav._id });
+            return res.status(200).json({ message: "Removed from favorites", isSaved: false });
+        }
+
+        await favModel.create({
+            user: userId,
+            song: songId
+        });
+
+        res.status(201).json({ message: "Added to favorites", isSaved: true });
+
+    } catch (error) {
+        res.status(500).json({ message: "Server Error", error: error.message });
+    }
+};
+async function getFav(req, res) {
+    try {
+        const userId = req.user.id
+
+        const fav = await favModel.find({ user: userId }).populate('song')
+        res.status(200).json({
+            success: true,
+            fav
+        });
+    } catch (error) {
+        res.status(500).json({ message: "Error fetching favorites" });
+    }
 }
 
-
-module.exports = { uploadSong, getSong }
+module.exports = { uploadSong, getSong, toggleFav, getFav }

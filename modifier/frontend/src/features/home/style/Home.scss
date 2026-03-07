@@ -4,44 +4,6 @@
   flex-direction: column;
   overflow: hidden;
 }
-
-/* NAVBAR */
-.navbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem 3rem;
-  backdrop-filter: var(--glass);
-  border-bottom: 1px solid var(--border);
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-
-  .logo {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-weight: 800;
-    color: var(--link-color);
-    letter-spacing: -0.5px;
-  }
-
-  .nav-links {
-    display: flex;
-    gap: 30px;
-    span {
-      font-size: 0.85rem;
-      color: var(--dim);
-      cursor: pointer;
-      &:hover { color: var(--text-main); }
-    }
-    .premium {
-      color: var(--link-color);
-      font-weight: 600;
-    }
-  }
-}
-
 /* BENTO GRID */
 .bento-container {
   display: grid;
