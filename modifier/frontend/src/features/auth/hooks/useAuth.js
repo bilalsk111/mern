@@ -1,10 +1,9 @@
-import { useContext, useEffect } from "react";
+import { useContext } from "react";
 import { AuthContext } from "../auth.context";
 import {
   registerUser,
   loginUser,
-  logoutUser,
-  getMe,
+  logoutUser
 } from "../services/auth.api";
 
 export const useAuth = () => {
@@ -36,19 +35,6 @@ export const useAuth = () => {
     }
   };
 
-  const handleGetMe = async () => {
-    try {
-      setLoading(true);
-      const res = await getMe();
-      setUser(res.data.user);
-    } catch (err) {
-      // If 401, just clear user silently
-      setUser(null);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleLogout = async () => {
     try {
       setLoading(true);
@@ -59,15 +45,11 @@ export const useAuth = () => {
     }
   };
 
-  useEffect(() => {
-    handleGetMe();
-  }, [setUser, setLoading]);
-
   return {
     user,
     loading,
     handleRegister,
     handleLogin,
-    handleLogout,
+    handleLogout
   };
 };

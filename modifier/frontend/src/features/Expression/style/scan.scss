@@ -1,238 +1,273 @@
 .scanner-container {
+  width: 100%;
   display: flex;
   justify-content: center;
-  align-items: center;
-
-  min-height: calc(100vh - 90px);
-  padding: 20px;
-
-  // background: radial-gradient(circle at top, #1b1b1b, #000);
 }
-
-
-/* CARD */
 
 .scanner-card {
   width: 100%;
-  max-width: 420px;
-
-  padding: 24px;
-  border-radius: 24px;
-
-  background: var(--card-bg);
-  backdrop-filter: blur(20px);
-
-  border: 1px solid var(--input-border);
-
-  box-shadow:
-    0 10px 40px rgba(0,0,0,0.6),
-    inset 0 1px 0 rgba(255,255,255,0.04);
+  background: rgba(15, 15, 20, 0.7);
+  backdrop-filter: blur(25px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 32px;
+  padding: 30px;
+  box-shadow: 0 40px 100px rgba(0, 0, 0, 0.5);
 }
-
-
-/* HEADER */
 
 .scanner-header {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 10px;
+  margin-bottom: 25px;
 
-  font-size: 12px;
-  letter-spacing: 1.5px;
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 2px;
+    color: var(--dim);
+  }
 
-  color: var(--link-color);
-  margin-bottom: 16px;
+  .status-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    .status-text {
+      font-size: 0.6rem;
+      font-weight: 700;
+      color: var(--dim);
+    }
+
+    .status-beacon {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+
+      &.online {
+        background: #00ff9d;
+        box-shadow: 0 0 15px #00ff9d;
+        animation: pulse 2s infinite;
+      }
+
+      &.offline {
+        background: #ff3040;
+      }
+    }
+  }
 }
-
-.status-dot {
-  margin-left: auto;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-}
-
-.online {
-  background: var(--text-main);
-}
-
-.offline {
-  background: var(--accent-like);
-}
-
-
-/* CAMERA */
 
 .camera-wrapper {
   position: relative;
-  width: 100%;
-  aspect-ratio: 4 / 3;
-
+  aspect-ratio: 16 / 9;
+  border-radius: 24px;
   overflow: hidden;
-  border-radius: 16px;
+  background: #050505;
+  border: 1px solid rgba(255, 255, 255, 0.05);
 
-  background: var(--auth-bg);
+  .viewport-overlay {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle, transparent 40%, rgba(0, 0, 0, 0.4) 100%);
+    z-index: 2;
+  }
 
-  border: 1px solid var(--link-color);
+  .camera-feed {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scaleX(-1);
+    filter: contrast(1.1) brightness(0.9);
+  }
+
+  .scan-line {
+    position: absolute;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--link-color), transparent);
+    box-shadow: 0 0 20px var(--link-color);
+    z-index: 5;
+    animation: scanLineMove 3s ease-in-out infinite;
+  }
+
+  .bracket {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    border: 2px solid var(--link-color);
+    z-index: 6;
+    opacity: 0.4;
+
+    &.tl {
+      top: 20px;
+      left: 20px;
+      border-right: 0;
+      border-bottom: 0;
+      border-radius: 8px 0 0 0;
+    }
+
+    &.tr {
+      top: 20px;
+      right: 20px;
+      border-left: 0;
+      border-bottom: 0;
+      border-radius: 0 8px 0 0;
+    }
+
+    &.bl {
+      bottom: 20px;
+      left: 20px;
+      border-right: 0;
+      border-top: 0;
+      border-radius: 0 0 0 8px;
+    }
+
+    &.br {
+      bottom: 20px;
+      right: 20px;
+      border-left: 0;
+      border-top: 0;
+      border-radius: 0 0 8px 0;
+    }
+  }
+
+  .scan-processing-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    gap: 15px;
+
+    p {
+      color: #fff;
+      font-size: 0.75rem;
+      letter-spacing: 2px;
+      font-weight: 700;
+    }
+  }
 }
 
-.camera-feed {
+.analysis-section {
+  padding: 35px 0;
+
+  .mood-display {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+
+    .mood-icon {
+      font-size: 2.5rem;
+    }
+
+    .mood-text {
+      font-size: 2.8rem;
+      font-weight: 900;
+      letter-spacing: -1.5px;
+      background: linear-gradient(to bottom, #fff 0%, #71717a 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-transform: uppercase;
+    }
+  }
+
+  .data-points {
+    width: 60%;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.05);
+    margin: 15px auto 0;
+    border-radius: 10px;
+    overflow: hidden;
+
+    .data-bar {
+      height: 100%;
+      background: var(--link-color);
+      transition: 1s ease;
+    }
+  }
+}
+
+.capture-btn {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
-
-  transform: scaleX(-1);
-}
-
-
-/* GRID */
-
-.scanner-grid {
-  position: absolute;
-  inset: 0;
-
-  background-image:
-    linear-gradient(var(--link-color) 1px, transparent 1px),
-    linear-gradient(90deg, var(--link-color) 1px, transparent 1px);
-
-  background-size: 40px 40px;
-  opacity: 0.15;
-}
-
-
-/* SCAN LINE */
-
-.scan-line {
-  position: absolute;
-  width: 100%;
-  height: 4px;
-
-  background: linear-gradient(
-    to bottom,
-    rgba(0,255,157,0),
-    #00ff9d,
-    rgba(0,255,157,0)
-  );
-
-  animation: scanMove 3s infinite ease-in-out;
-}
-
-@keyframes scanMove {
-  0% { top: 0% }
-  50% { top: 100% }
-  100% { top: 0% }
-}
-
-
-/* CORNERS */
-
-.corner {
-  position: absolute;
-  width: 20px;
-  height: 20px;
-
-  border: 2px solid #00ff9d;
-}
-
-.tl { top: 8px; left: 8px; border-right: none; border-bottom: none; }
-.tr { top: 8px; right: 8px; border-left: none; border-bottom: none; }
-.bl { bottom: 8px; left: 8px; border-right: none; border-top: none; }
-.br { bottom: 8px; right: 8px; border-left: none; border-top: none; }
-
-
-/* OVERLAY */
-
-.scan-overlay {
-  position: absolute;
-  inset: 0;
-
+  padding: 20px;
+  border-radius: 20px;
+  background: #fff;
+  color: #000;
+  font-weight: 800;
+  font-size: 0.9rem;
+  letter-spacing: 1px;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-
-  backdrop-filter: blur(5px);
-  background: rgba(0,0,0,0.45);
-
-  color: #00ff9d;
-}
-
-
-/* EXPRESSION */
-
-.expression-section {
-  text-align: center;
-  margin-top: 18px;
-}
-
-.expression-text {
-  font-size: 2rem;
-  font-weight: 700;
-  color: white;
-
-  text-shadow: 0 0 12px rgba(0,255,157,.3);
-}
-
-
-/* BUTTON */
-
-.scan-button {
-  width: 100%;
-  margin-top: 18px;
-
-  padding: 14px;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 10px;
-
+  gap: 12px;
   border: none;
-  border-radius: 14px;
-
-  font-weight: 600;
-
-  color: black;
-
-  background: linear-gradient(135deg, #00ff9d, #00d084);
-
   cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1);
 
-  transition: all .25s ease;
+  &:hover:not(:disabled) {
+    background: var(--link-color);
+    color: #fff;
+    transform: translateY(-4px);
+    box-shadow: 0 15px 30px rgba(0, 149, 246, 0.4);
+  }
+
+  &:active {
+    transform: translateY(-1px) scale(0.98);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    filter: grayscale(1);
+  }
 }
 
-.scan-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0,255,157,.35);
+@keyframes scanLineMove {
+  0% {
+    top: 0%;
+  }
+
+  50% {
+    top: 100%;
+  }
+
+  100% {
+    top: 0%;
+  }
 }
 
-.scan-button:disabled {
-  opacity: .6;
-  cursor: not-allowed;
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  50% {
+    transform: scale(1.4);
+    opacity: 0.5;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
-
-
-/* SPIN */
 
 .spin {
-  animation: spin 1s linear infinite;
+  animation: rotate 1.2s linear infinite;
 }
 
-@keyframes spin {
-  from { transform: rotate(0) }
-  to { transform: rotate(360deg) }
-}
-
-
-/* MOBILE */
-
-@media (max-width: 480px) {
-
-  .scanner-card {
-    padding: 20px;
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
   }
 
-  .camera-wrapper {
-    aspect-ratio: 1 / 1;
+  to {
+    transform: rotate(360deg);
   }
-
 }

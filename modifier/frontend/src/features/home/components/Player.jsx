@@ -7,10 +7,9 @@ import {
   Shuffle,
   RotateCcw,
   RotateCw,
+  Volume1,
 } from "lucide-react";
-
 import "../../home/style/Player.scss";
-import { useContext } from "react";
 
 const Player = () => {
   const { song } = useSong();
@@ -38,10 +37,7 @@ const Player = () => {
 
   const togglePlay = () => {
     if (!audioRef.current) return;
-
-    if (isPlaying) audioRef.current.pause();
-    else audioRef.current.play();
-
+    isPlaying ? audioRef.current.pause() : audioRef.current.play();
     setIsPlaying(!isPlaying);
   };
 
@@ -57,6 +53,15 @@ const Player = () => {
     audioRef.current.currentTime = percent * audioRef.current.duration;
   };
 
+  // FIX: Forward & Backward Functions
+  const skipForward = () => {
+    if (audioRef.current) audioRef.current.currentTime += 5;
+  };
+
+  const skipBackward = () => {
+    if (audioRef.current) audioRef.current.currentTime -= 5;
+  };
+
   const format = (sec) => {
     if (!sec) return "0:00";
     const m = Math.floor(sec / 60);
@@ -64,13 +69,10 @@ const Player = () => {
     return `${m}:${s < 10 ? "0" : ""}${s}`;
   };
 
-  const back5 = () => {
-    audioRef.current.currentTime -= 5;
-  };
-
-  const forward5 = () => {
-    audioRef.current.currentTime += 5;
-  };
+  // SHORT TRICK: Artist name clean karne ke liye (Sirf pehla naam dikhayega)
+  const cleanArtist = song.artist 
+    ? song.artist
+    : song.mood;
 
   return (
     <div className="player">
@@ -81,57 +83,58 @@ const Player = () => {
         onEnded={() => setIsPlaying(false)}
       />
 
-      {/* LEFT */}
-      <div className="player-left">
-        <img
-          src={song.posterUrl || "/default-cover.png"}
-          alt="cover"
-          className="cover"
-        />
-        <div className="meta">
-          <p className="title">{song.title}</p>
-          <p className="mood">{song.mood}</p>
-        </div>
-        <Heart className="like" size={18} />
+      <div className="player-header">
+        <Volume2 size={18} />
+        <span>Now Playing</span>
       </div>
 
-      {/* CENTER */}
-      <div className="player-center">
-        <div className="controls">
-          <Shuffle size={18} />
-
-          <button onClick={back5}>
-            <RotateCcw size={22} />
-            <span>5</span>
-          </button>
-
-          <button className="play" onClick={togglePlay}>
-            {isPlaying ? "❚❚" : "▶"}
-          </button>
-
-          <button onClick={forward5}>
-            <RotateCw size={22} />
-            <span>5</span>
-          </button>
-
-          <Repeat size={18} />
+      <div className="player-left">
+        <div className="cover-wrapper">
+          <img
+            src={song.posterUrl || "/default-cover.png"}
+            alt="cover"
+            className="cover"
+          />
+          {isPlaying && (
+            <div className="visualizer-overlay">
+               <div className="playing-bars white"><span></span><span></span><span></span></div>
+            </div>
+          )}
         </div>
+        
+        <div className="meta">
+          <div className="info-text">
+            <p className="title">{song.title}</p>
+            <p className="mood">{song.artist || song.mood}</p>
+          </div>
+          <Heart className="like" size={20} />
+        </div>
+      </div>
 
+      <div className="player-center">
         <div className="progress-wrapper">
           <span>{format(audioRef.current?.currentTime)}</span>
-
           <div className="progress" onClick={seek}>
             <div className="progress-fill" style={{ width: `${progress}%` }} />
           </div>
-
           <span>{format(audioRef.current?.duration)}</span>
+        </div>
+
+        <div className="controls">
+          {/* FIX: onClick added here */}
+          <button onClick={skipBackward}><RotateCcw size={20} /></button>
+          
+          <button className="play" onClick={togglePlay}>
+            {isPlaying ? "❚❚" : "▶"}
+          </button>
+          
+          {/* FIX: onClick added here */}
+          <button onClick={skipForward}><RotateCw size={20} /></button>
         </div>
       </div>
 
-      {/* RIGHT */}
       <div className="player-right">
-        <Volume2 size={18} />
-
+        <Volume1 size={16} />
         <input
           type="range"
           min="0"

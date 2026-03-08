@@ -1,5 +1,6 @@
 /* SaaS Design Tokens - Light Mode */
 :root {
+   --side-bg: #222222;
   --auth-bg: #fafafa;
   --card-bg: #ffffff;
   --text-main: #262626;
@@ -25,6 +26,7 @@
 /* Dark Mode */
 @media (prefers-color-scheme: dark) {
   :root {
+    --side-bg: #222222;
     --auth-bg: #000;
     --card-bg: #121212;
     --text-main: #fff;

@@ -1,218 +1,198 @@
+/* SaaS Design Tokens Reference */
 $green: var(--link-color);
 $text: var(--text-main);
 $dim: var(--dim);
 
 .player {
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  height: 90px;
-  background: var(--card-bg);
-  border-top: 1px solid var(--input-border);
-
+  background: rgba(10, 10, 15, 0.4);
+  backdrop-filter: blur(30px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 35px;
+  padding: 25px;
   display: flex;
-  align-items: center;
-  padding: 0 16px;
+  flex-direction: column; // Vertical layout as per screenshot
   gap: 20px;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
+  width: 100%;
+
+  // Header "Now Playing" inside the card
+  .player-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #fff;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 5px;
+
+    svg {
+      color: var(--link-color);
+    }
+  }
 }
 
-/* LEFT */
-
 .player-left {
-
-  flex: 1;
   display: flex;
-  align-items: center;
-  gap: 12px;
+  flex-direction: column; // Stack art and text
+  align-items: flex-start;
+  gap: 15px;
 
-  .cover {
-    width: 52px;
-    height: 52px;
-    border-radius: 4px;
-    object-fit: cover;
+  .cover-wrapper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1;
+
+    .cover {
+      width: 100%;
+      height: 100%;
+      border-radius: 20px;
+      object-fit: cover;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+    }
+
+    .visualizer-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 20px;
+    }
   }
 
   .meta {
+    width: 100%;
     display: flex;
-    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-start;
 
-    .title {
-      color: $text;
-      font-size: 14px;
-      max-width: 200px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+    .info-text {
+      .title {
+        font-weight: 800;
+        color: #fff;
+        font-size: 1.1rem;
+        margin: 0;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+
+      .mood {
+        color: var(--dim);
+        font-size: 0.6rem;
+        margin-top: 4px;
+          display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
     }
 
-    .mood {
-      color: $dim;
-      font-size: 11px;
-    }
-  }
-
-  .like {
-    color: $dim;
-    cursor: pointer;
-
-    &:hover {
-      color: $text;
-    }
-  }
-
-}
-
-/* CENTER */
-
-.player-center {
-
-  flex: 2;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-
-  .controls {
-
-    display: flex;
-    align-items: center;
-    gap: 20px;
-
-    svg {
-      color: $dim;
+    .like {
+      color: var(--dim);
       cursor: pointer;
+      transition: 0.3s;
+      margin-top: 5px;
 
       &:hover {
-        color: $text;
+        color: var(--accent-like);
+        transform: scale(1.1);
+      }
+    }
+  }
+}
+
+.player-center {
+  width: 100%;
+
+  .progress-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+
+    span {
+      font-size: 0.75rem;
+      color: var(--dim);
+      width: 35px;
+    }
+
+    .progress {
+      flex: 1;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      cursor: pointer;
+      position: relative;
+
+      .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--link-color), #a855f7);
+        border-radius: 10px;
+        box-shadow: 0 0 15px var(--link-color);
+      }
+    }
+  }
+
+  .controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 25px;
+
+    svg {
+      color: #fff;
+      cursor: pointer;
+      transition: 0.2s;
+      opacity: 0.8;
+
+      &:hover {
+        opacity: 1;
+        transform: translateY(-2px);
       }
     }
 
     button {
       background: none;
       border: none;
-      color: $dim;
-      display: flex;
-      align-items: center;
-      gap: 3px;
-      cursor: pointer;
-    }
-
-    .play {
-      width: 42px;
-      height: 42px;
-      border-radius: 50%;
-      background: white;
-      color: black;
-      font-size: 18px;
+      padding: 0;
       display: flex;
       align-items: center;
       justify-content: center;
     }
 
+    .play {
+      width: 58px;
+      height: 58px;
+      background: linear-gradient(135deg, var(--link-color), #a855f7) !important;
+      color: #fff !important;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 10px 25px rgba(124, 58, 237, 0.3);
+
+      &:hover {
+        transform: scale(1.08);
+        box-shadow: 0 10px 30px rgba(124, 58, 237, 0.5);
+      }
+    }
   }
-
-  .progress-wrapper {
-
-    width: 100%;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-
-    span {
-      font-size: 11px;
-      color: $dim;
-      width: 35px;
-      text-align: center;
-    }
-
-    .progress {
-
-      flex: 1;
-      height: 6px;
-      background: var(--input-border);
-      border-radius: 5px;
-      cursor: pointer;
-
-    }
-
-    .progress-fill {
-      height: 100%;
-      background: $green;
-      border-radius: 5px;
-    }
-
-  }
-
 }
-
-/* RIGHT */
 
 .player-right {
-
-  flex: 1;
   display: flex;
-  justify-content: flex-end;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
+  color: var(--dim);
+  padding: 0 10px;
 
-  input {
-    width: 110px;
-    accent-color: $green;
-  }
-
-}
-
-/* MOBILE */
-
-@media(max-width:768px) {
-
-  .player {
-    flex-direction: column;
-    height: auto;
-    padding: 10px;
-    gap: 10px;
-  }
-
-  .player-left {
-    width: 100%;
-  }
-
-  .player-center {
-    width: 100%;
-  }
-
-  .player-right {
-    display: none;
-  }
-
-  .controls {
-    gap: 16px;
-  }
-
-  .progress-wrapper span {
-    display: none;
-  }
-
-}
-
-/* Premium Player */
-.player {
-  background: var(--hover-bg);
-  backdrop-filter: blur(20px);
-  border-top: 1px solid var(--input-border);
-  padding: 0 40px;
-
-  .play {
-    background: var(--text-main) !important;
-    color: var(--auth-bg) !important;
-
-    &:hover {
-      transform: scale(1.1);
-    }
-  }
-
-  .progress-fill {
-    background: var(--link-color) !important;
-    box-shadow: 0 0 10px var(--link-color);
+  input[type="range"] {
+    flex: 1;
+    height: 4px;
+    accent-color: var(--link-color);
+    cursor: pointer;
   }
 }
