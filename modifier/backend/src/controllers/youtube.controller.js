@@ -2,64 +2,70 @@ const axios = require("axios");
 
 async function getSongsByMood(req, res) {
   try {
+
     const mood = (req.query.mood || "neutral").toLowerCase();
 
-    // Humne yahan "official music video" aur negative filters (-lofi -jukebox) add kiye hain
     const moodMap = {
-      happy: "latest Bollywood official music video 2026 -lofi -jukebox -hour",
-      sad: "Arijit Singh sad official song -lofi -jukebox -slowed -reverb",
-      surprise: "latest Hindi party official video -lofi -mix",
-      neutral: "Lofi nahi, official chill Bollywood songs -remix -jukebox",
-      calm: "soothing Bollywood official acoustic -meditation -lofi -jukebox",
-      angry: "aggressive bollywood rock official video -lofi"
+
+      happy: "latest bollywood happy official video -lofi -jukebox",
+      sad: "arijit singh sad official video -slowed",
+      calm: "soothing bollywood acoustic song",
+      neutral: "chill bollywood song official video",
+      angry: "bollywood rock official music video",
+      surprise: "latest hindi party official video",
+
+      romantic: "bollywood romantic love song official video",
+      energetic: "bollywood dance hit song official video",
+      focus: "instrumental focus study music",
+      party: "bollywood party anthem official video"
+
     };
 
-    const query = moodMap[mood] || "latest bollywood official song";
+    const query =
+      mood === "all"
+        ? "latest bollywood official music video"
+        : moodMap[mood] || "latest bollywood song";
 
-    const response = await axios.get(
+    const { data } = await axios.get(
       "https://www.googleapis.com/youtube/v3/search",
       {
         params: {
           part: "snippet",
           q: query,
-          maxResults: 20, // Zyada results fetch karke filter karenge
+          maxResults: 20,
           type: "video",
-          videoCategoryId: "10", // Category 10 is strictly Music
-          videoDuration: "medium", // Filters out shorts and very long jukeboxes (3-20 mins)
+          videoCategoryId: "10",
           relevanceLanguage: "hi",
           key: process.env.YOUTUBE_API_KEY
         }
       }
     );
 
-    // Map songs and clean titles (YouTube titles are often messy)
-    const songs = response.data.items.map((item) => {
-      let cleanTitle = item.snippet.title
+    const songs = data.items.map((item) => {
+
+      const title = item.snippet.title
         .replace(/&quot;/g, '"')
         .replace(/&#39;/g, "'")
-        .replace(/Official Video|Official Song|Music Video|LYRICAL|Full Video/gi, "");
+        .replace(/Official Video|Music Video|Full Video/gi, "")
+        .trim();
 
       return {
-        id: item.id.videoId,
-        title: cleanTitle.trim(),
-        artist: item.snippet.channelTitle.replace(" - Topic", ""), // Cleaner artist names
-        posterUrl: item.snippet.thumbnails.high.url,
         videoId: item.id.videoId,
-        mood: mood,
-        year: "2026"
+        title,
+        artist: item.snippet.channelTitle.replace(" - Topic", ""),
+        posterUrl: item.snippet.thumbnails.high.url,
+        mood
       };
+
     });
 
-    res.json({
-      message: "Songs fetched successfully",
-      songs
-    });
+    res.json({ songs });
 
   } catch (error) {
-    console.log("YT API ERROR:", error.response?.data || error.message);
-    res.status(500).json({
-      error: error.response?.data || error.message
-    });
+
+    console.log("YT API ERROR:", error.message);
+    res.status(500).json({ error: error.message });
+
   }
 }
 

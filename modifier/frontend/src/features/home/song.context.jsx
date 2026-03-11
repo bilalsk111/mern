@@ -7,6 +7,7 @@ export const SongProvider = ({ children }) => {
   const [currentSong, setCurrentSong] = useState(null);
   const [recommendations, setRecommendations] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   return (
     <SongContext.Provider
@@ -16,7 +17,9 @@ export const SongProvider = ({ children }) => {
         recommendations,
         setRecommendations,
         loading,
-        setLoading
+        setLoading,
+        isPlaying,
+        setIsPlaying
       }}
     >
       {children}

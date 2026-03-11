@@ -7,7 +7,7 @@ import "../style/Home.scss";
 import { useAuth } from "../../auth/hooks/useAuth";
 
 const Home = () => {
-  const {user} = useAuth()
+  const { user } = useAuth();
   const { handleGetSong, recommendations, loading, song, setSong } = useSong();
 
   return (
@@ -27,52 +27,52 @@ const Home = () => {
         </div>
       </header>
 
-   <section className="top-grid">
+      <section className="top-grid">
+        <div className="card scanner-card-wrapper">
+          <FaceExpression onClick={handleGetSong} />
+        </div>
 
-  <div className="card scanner-card-wrapper">
-    <FaceExpression onClick={handleGetSong} />
-  </div>
+        <div className="card player-card">
+          <div className="card-title">
+            <Sparkles size={18} />
+            <h3>Now Playing</h3>
+          </div>
 
-  <div className="card player-card">
+          <Player />
 
-    <div className="card-title">
-      <Sparkles size={18} />
-      <h3>Now Playing</h3>
-    </div>
-
-    <Player />
-
-    {!song && (
-      <div className="empty-player">
-        <p>No track selected. Scan your mood to start.</p>
-      </div>
-    )}
-
-  </div>
-
-</section>
+          {!song && (
+            <div className="empty-player">
+              <p>No track selected. Scan your mood to start.</p>
+            </div>
+          )}
+        </div>
+      </section>
       <section className="card songs-section">
         <div className="card-title">
           <Music size={18} />
           <h3>Recommended For You</h3>
         </div>
 
-    
-          <div className="song-grid">
-            {recommendations.map((item) => (
-              <div
-                key={item._id}
-                className={`song-card ${song?._id === item._id ? "active" : ""}`}
-                onClick={() => setSong(item)}
-              >
-                <img src={item.posterUrl} alt={item.title} />
-                <div className="overlay" />
+        <div className="song-grid">
+          {recommendations.map((item) => (
+            <div
+              key={item._id}
+              className={`song-card ${song?._id === item._id ? "active" : ""}`}
+              onClick={() => setSong(item)}
+            >
+              {/* Background Image */}
+              <img src={item.posterUrl} alt={item.title} />
+
+              {/* Dark Gradient Overlay & Text */}
+              <div className="overlay">
                 <div className="song-info">
                   <h4>{item.title}</h4>
+                  <h5>{item.mood}</h5>
                 </div>
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
+        </div>
       </section>
     </div>
   );

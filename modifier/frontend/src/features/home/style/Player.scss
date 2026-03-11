@@ -1,193 +1,228 @@
-/* SaaS Design Tokens Applied */
-
+/* =========================================
+   PREMIUM PLAYER DESIGN (MINI CARD)
+========================================= */
 .player {
   background: var(--card-bg);
-  backdrop-filter: var(--glass);
+  backdrop-filter: blur(25px) saturate(180%);
   border: 1px solid var(--border);
-  border-radius: 35px;
+  border-radius: 32px;
   padding: 25px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.05);
+  justify-content: space-between;
+  gap: 25px;
+  height: 100%;
+  max-width: 420px;
   width: 100%;
-
-  .player-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    color: var(--text-main);
-    font-size: 0.9rem;
-    font-weight: 600;
-    margin-bottom: 5px;
-
-    svg {
-      color: var(--link-color);
-    }
-  }
+  margin: 0 auto;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
 }
 
-.player-left {
+/* =====================
+   TOP: COVER & META
+===================== */
+.player .player-left {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 15px;
-
-  .cover-wrapper {
-    position: relative;
-    width: 100%;
-    aspect-ratio: 1;
-
-    .cover {
-      width: 100%;
-      height: 100%;
-      border-radius: 20px;
-      object-fit: cover;
-      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-    }
-
-    .visualizer-overlay {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: rgba(0, 0, 0, 0.05);
-      border-radius: 20px;
-    }
-  }
-
-  .meta {
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-
-    .info-text {
-      .title {
-        font-weight: 800;
-        color: var(--text-main);
-        font-size: 1.1rem;
-        margin: 0;
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-      }
-
-      .mood {
-        color: var(--dim);
-        font-size: 0.6rem;
-        margin-top: 4px;
-        display: -webkit-box;
-        -webkit-line-clamp: 3;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-      }
-    }
-
-    .like {
-      color: var(--dim);
-      cursor: pointer;
-      transition: 0.3s;
-      margin-top: 5px;
-
-      &:hover {
-        color: var(--accent-like);
-        transform: scale(1.1);
-      }
-    }
-  }
-}
-
-.player-center {
+  align-items: center;
+  gap: 16px;
   width: 100%;
-
-  .progress-wrapper {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 20px;
-
-    span {
-      font-size: 0.75rem;
-      color: var(--dim);
-      width: 35px;
-    }
-
-    .progress {
-      flex: 1;
-      height: 4px;
-      background: var(--input-border);
-      border-radius: 10px;
-      cursor: pointer;
-      position: relative;
-
-      .progress-fill {
-        height: 100%;
-        background: var(--link-color);
-        border-radius: 10px;
-        box-shadow: 0 0 10px rgba(0, 149, 246, 0.3);
-      }
-    }
-  }
-
-  .controls {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 25px;
-
-    svg {
-      color: var(--icon-color);
-      cursor: pointer;
-      transition: 0.2s;
-
-      &:hover {
-        color: var(--text-main);
-        transform: translateY(-2px);
-      }
-    }
-
-    button {
-      background: none;
-      border: none;
-      padding: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .play {
-      width: 58px;
-      height: 58px;
-      background: var(--link-color) !important;
-      color: var(--btn-text) !important;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 10px 25px rgba(0, 149, 246, 0.3);
-
-      &:hover {
-        transform: scale(1.08);
-        box-shadow: 0 10px 30px rgba(0, 149, 246, 0.5);
-      }
-    }
-  }
 }
 
-.player-right {
+.player .player-left .cover-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 800px;
+  aspect-ratio: 1;
+  border-radius: 24px;
+  overflow: hidden;
+  margin: 0 auto;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+}
+
+.player .player-left .cover-wrapper .cover {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.player .player-left .cover-wrapper:hover .cover {
+  transform: scale(1.05);
+}
+
+/* Favorite Button */
+.player .player-left .cover-wrapper .favorite-btn {
+  
+  position: absolute;
+  bottom: 15px;
+  right: 15px;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 12px;
+  border-radius: 50%;
+  color: var(--text-main);
   display: flex;
   align-items: center;
-  gap: 12px;
-  color: var(--dim);
-  padding: 0 10px;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 3;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 
-  input[type="range"] {
-    flex: 1;
-    height: 4px;
-    accent-color: var(--link-color);
-    cursor: pointer;
-  }
+}
+
+.player .player-left .cover-wrapper .favorite-btn:hover {
+  background: var(--card-bg);
+  transform: scale(1.15);
+}
+
+.player .player-left .cover-wrapper .favorite-btn:hover svg {
+  stroke: var(--accent-like);
+  color: var(--accent-like);
+}
+
+.player .player-left .cover-wrapper .favorite-btn.liked {
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 5px 15px rgba(255, 48, 64, 0.3);
+}
+
+/* Song Meta */
+.player .player-left .meta {
+  width: 100%;
+  text-align: center;
+}
+
+.player .player-left .meta .info-text .title {
+  font-weight: 800;
+  color: var(--text-main);
+  font-size: 1.3rem;
+  margin: 0 0 5px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.player .player-left .meta .info-text .mood {
+  color: var(--dim);
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* =====================
+   CENTER: CONTROLS & PROGRESS
+===================== */
+.player .player-center {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Progress Bar */
+.player .player-center .progress-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.player .player-center .progress-wrapper span {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--dim);
+  font-variant-numeric: tabular-nums;
+}
+
+.player .player-center .progress-wrapper .progress {
+  flex: 1;
+  height: 6px;
+  background: var(--input-border);
+  border-radius: 10px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: height 0.2s ease;
+}
+
+.player .player-center .progress-wrapper .progress:hover {
+  height: 8px;
+}
+
+.player .player-center .progress-wrapper .progress .progress-fill {
+  height: 100%;
+  background: var(--link-color);
+  border-radius: 10px;
+  box-shadow: 0 0 15px rgba(0, 149, 246, 0.5);
+  transition: width 0.1s linear;
+}
+
+/* Player Controls */
+.player .player-center .controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+.player .player-center .controls svg {
+  color: var(--icon-color);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.player .player-center .controls svg:hover {
+  color: var(--text-main);
+  transform: translateY(-2px);
+}
+
+.player .player-center .controls button {
+  background: none;
+  border: none;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Play Button */
+.player .player-center .controls .play {
+  width: 60px;
+  height: 60px;
+  background: var(--link-color) !important;
+  color: #ffffff !important;
+  border-radius: 50%;
+  box-shadow: 0 10px 25px rgba(0, 149, 246, 0.4);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.player .player-center .controls .play svg {
+  color: #ffffff;
+}
+
+.player .player-center .controls .play:hover {
+  transform: scale(1.1);
+  box-shadow: 0 15px 35px rgba(0, 149, 246, 0.6);
+}
+
+/* Compact Volume Control */
+.player .player-center .controls .volume-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100px;
+  margin-left: 10px;
+}
+
+.player .player-center .controls .volume-control input[type="range"] {
+  flex: 1;
+  height: 4px;
+  accent-color: var(--link-color);
+  cursor: pointer;
+  border-radius: 10px;
 }

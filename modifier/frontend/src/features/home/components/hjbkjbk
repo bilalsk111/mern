@@ -150,3 +150,110 @@ const Player = () => {
 };
 
 export default Player;
+
+
+import React from "react";
+import { useSong } from "../../home/hooks/useSong";
+import {
+  Heart,
+  Volume2,
+  Repeat,
+  Shuffle,
+  RotateCcw,
+  RotateCw
+} from "lucide-react";
+
+import "../../home/style/Player.scss";
+
+const Player = () => {
+
+  const { song, isPlaying } = useSong();
+
+  if (!song) return null;
+
+  return (
+    <div className="player">
+
+      <iframe
+        width="0"
+        height="0"
+        src={`https://www.youtube.com/embed/${song.videoId}?autoplay=${isPlaying ? 1 : 0}`}
+        title={song.title}
+        allow="autoplay"
+        style={{ display: "none" }}
+      />
+
+      <div className="player-left">
+
+        <img
+          src={song.posterUrl}
+          alt="cover"
+          className="cover"
+        />
+
+        <div className="meta">
+          <p className="title">{song.title}</p>
+          <p className="mood">{song.mood}</p>
+        </div>
+
+        <Heart className="like" size={18} />
+
+      </div>
+
+      <div className="player-center">
+
+        <div className="controls">
+
+          <Shuffle size={18} />
+
+          <button>
+            <RotateCcw size={22} />
+            <span>5</span>
+          </button>
+
+          <button className="play">
+            {isPlaying ? "❚❚" : "▶"}
+          </button>
+
+          <button>
+            <RotateCw size={22} />
+            <span>5</span>
+          </button>
+
+          <Repeat size={18} />
+
+        </div>
+
+      </div>
+
+      <div className="player-right">
+
+        <Volume2 size={18} />
+
+        <input
+          type="range"
+          min="0"
+          max="1"
+          step="0.01"
+          defaultValue="0.7"
+        />
+
+      </div>
+
+    </div>
+  );
+};
+
+export default Player;
+
+ <iframe
+        ref={iframeRef}
+        width="0"
+        height="0"
+        src={`https://www.youtube.com/embed/${song.videoId}?enablejsapi=1&autoplay=0`}
+        title="player"
+        frameBorder="0"
+        allow="autoplay"
+      />
+
+      

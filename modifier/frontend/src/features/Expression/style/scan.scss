@@ -1,3 +1,6 @@
+/* =========================================
+   SCANNER CONTAINER & CARD
+========================================= */
 .scanner-container {
   width: 100%;
   display: flex;
@@ -14,182 +17,197 @@
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.05);
 }
 
+/* =========================================
+   SCANNER HEADER
+========================================= */
 .scanner-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 25px;
-
-  .header-left {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 0.75rem;
-    font-weight: 800;
-    letter-spacing: 1.5px;
-    color: var(--text-main);
-  }
-
-  .status-container {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-
-    .status-text {
-      font-size: 0.65rem;
-      font-weight: 700;
-      color: var(--dim);
-    }
-
-    .status-beacon {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-
-      &.online {
-        background: var(--accent);
-        box-shadow: 0 0 10px var(--accent);
-        animation: pulse 2s infinite;
-      }
-
-      &.offline {
-        background: var(--dim);
-      }
-    }
-  }
 }
 
+.scanner-header .header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  color: var(--text-main);
+}
+
+.scanner-header .status-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.scanner-header .status-container .status-text {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--dim);
+}
+
+.scanner-header .status-container .status-beacon {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.scanner-header .status-container .status-beacon.online {
+  background: var(--accent);
+  box-shadow: 0 0 10px var(--accent);
+  animation: pulse 2s infinite;
+}
+
+.scanner-header .status-container .status-beacon.offline {
+  background: var(--dim);
+}
+
+/* =========================================
+   CAMERA WRAPPER
+========================================= */
 .camera-wrapper {
   position: relative;
-  aspect-ratio: 16 / 10;
+  aspect-ratio: 4/3;
   border-radius: 24px;
   overflow: hidden;
   background: #000;
   border: 4px solid var(--input-bg);
-
-  .camera-feed {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transform: scaleX(-1);
-  }
-
-  .viewport-overlay {
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(circle, transparent 30%, rgba(0, 0, 0, 0.4) 100%);
-    z-index: 2;
-  }
-
-  .scan-line {
-    position: absolute;
-    width: 100%;
-    height: 2px;
-    background: var(--link-color);
-    box-shadow: 0 0 15px var(--link-color);
-    z-index: 5;
-    animation: scanLineMove 3s ease-in-out infinite;
-  }
-
-  .bracket {
-    position: absolute;
-    width: 25px;
-    height: 25px;
-    border: 3px solid white;
-    z-index: 6;
-
-    &.tl {
-      top: 15px;
-      left: 15px;
-      border-right: 0;
-      border-bottom: 0;
-      border-radius: 8px 0 0 0;
-    }
-
-    &.tr {
-      top: 15px;
-      right: 15px;
-      border-left: 0;
-      border-bottom: 0;
-      border-radius: 0 8px 0 0;
-    }
-
-    &.bl {
-      bottom: 15px;
-      left: 15px;
-      border-right: 0;
-      border-top: 0;
-      border-radius: 0 0 0 8px;
-    }
-
-    &.br {
-      bottom: 15px;
-      right: 15px;
-      border-left: 0;
-      border-top: 0;
-      border-radius: 0 0 8px 0;
-    }
-  }
-
-  .scan-processing-overlay {
-    position: absolute;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.7);
-    backdrop-filter: blur(4px);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    z-index: 10;
-    gap: 15px;
-
-    p {
-      color: white;
-      font-size: 0.8rem;
-      letter-spacing: 2px;
-      font-weight: 700;
-    }
-  }
 }
 
+.camera-wrapper .camera-feed {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scaleX(-1);
+}
+
+.camera-wrapper .viewport-overlay {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, transparent 30%, rgba(0, 0, 0, 0.4) 100%);
+  z-index: 2;
+}
+
+.camera-wrapper .scan-line {
+  position: absolute;
+  width: 100%;
+  height: 2px;
+  background: var(--link-color);
+  box-shadow: 0 0 15px var(--link-color);
+  z-index: 5;
+  animation: scanLineMove 3s ease-in-out infinite;
+}
+
+/* Corner Brackets */
+.camera-wrapper .bracket {
+  position: absolute;
+  width: 25px;
+  height: 25px;
+  border: 3px solid white;
+  z-index: 6;
+}
+
+.camera-wrapper .bracket.tl {
+  top: 15px;
+  left: 15px;
+  border-right: 0;
+  border-bottom: 0;
+  border-radius: 8px 0 0 0;
+}
+
+.camera-wrapper .bracket.tr {
+  top: 15px;
+  right: 15px;
+  border-left: 0;
+  border-bottom: 0;
+  border-radius: 0 8px 0 0;
+}
+
+.camera-wrapper .bracket.bl {
+  bottom: 15px;
+  left: 15px;
+  border-right: 0;
+  border-top: 0;
+  border-radius: 0 0 0 8px;
+}
+
+.camera-wrapper .bracket.br {
+  bottom: 15px;
+  right: 15px;
+  border-left: 0;
+  border-top: 0;
+  border-radius: 0 0 8px 0;
+}
+
+/* Processing Overlay */
+.camera-wrapper .scan-processing-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  gap: 15px;
+}
+
+.camera-wrapper .scan-processing-overlay p {
+  color: white;
+  font-size: 0.8rem;
+  letter-spacing: 2px;
+  font-weight: 700;
+}
+
+/* =========================================
+   ANALYSIS SECTION
+========================================= */
 .analysis-section {
   padding: 25px 0;
-
-  .mood-display {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 15px;
-
-    .mood-icon {
-      font-size: 2.2rem;
-    }
-
-    .mood-text {
-      font-size: 2.4rem;
-      font-weight: 900;
-      color: var(--text-main);
-      text-transform: uppercase;
-      letter-spacing: -1px;
-    }
-  }
-
-  .data-points {
-    width: 80%;
-    height: 6px;
-    background: var(--input-bg);
-    margin: 15px auto 0;
-    border-radius: 10px;
-    overflow: hidden;
-
-    .data-bar {
-      height: 100%;
-      background: var(--link-color);
-      transition: 0.3s ease;
-    }
-  }
 }
 
+.analysis-section .mood-display {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+}
+
+.analysis-section .mood-display .mood-icon {
+  font-size: 2.2rem;
+}
+
+.analysis-section .mood-display .mood-text,
+.analysis-section .mood-display span {
+  font-size: 2.4rem;
+  font-weight: 900;
+  color: var(--text-main);
+  text-transform: uppercase;
+  letter-spacing: -1px;
+}
+
+.analysis-section .data-points {
+  width: 80%;
+  height: 6px;
+  background: var(--input-bg);
+  margin: 15px auto 0;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.analysis-section .data-points .data-bar {
+  height: 100%;
+  background: var(--link-color);
+  transition: 0.3s ease;
+}
+
+/* =========================================
+   CAPTURE BUTTON
+========================================= */
 .capture-btn {
   width: 100%;
   padding: 18px;
@@ -204,40 +222,30 @@
   justify-content: center;
   gap: 10px;
   transition: all 0.3s ease;
-
-  &:hover:not(:disabled) {
-    background: var(--link-color);
-    transform: translateY(-2px);
-  }
-
-  &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
 }
 
-@keyframes scanLineMove {
-  0% {
-    top: 0%;
-  }
+.capture-btn:hover:not(:disabled) {
+  background: var(--link-color);
+  transform: translateY(-2px);
+}
 
-  100% {
-    top: 100%;
-  }
+.capture-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* =========================================
+   ANIMATIONS
+========================================= */
+@keyframes scanLineMove {
+  0% { top: 0%; }
+  100% { top: 100%; }
 }
 
 @keyframes pulse {
-  0% {
-    opacity: 1;
-  }
-
-  50% {
-    opacity: 0.4;
-  }
-
-  100% {
-    opacity: 1;
-  }
+  0% { opacity: 1; }
+  50% { opacity: 0.4; }
+  100% { opacity: 1; }
 }
 
 .spin {
@@ -245,11 +253,6 @@
 }
 
 @keyframes rotate {
-  from {
-    transform: rotate(0deg);
-  }
-
-  to {
-    transform: rotate(360deg);
-  }
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }

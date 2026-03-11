@@ -107,7 +107,7 @@ export default function FaceExpression({ onClick = () => {} }) {
 
         <div className="analysis-section">
           <div className="mood-display">
-            <span className="mood-icon">{moodEmoji[expression] || "😐"}</span>
+            <span className="mood-icon">{moodEmoji[expression] || "😐 neutral"}</span>
             <h2 className="mood-text">{expression}</h2>
           </div>
           <div className="data-points">

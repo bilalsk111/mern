@@ -11,6 +11,15 @@ export const uploadSong = async (formData) => {
 };
 
 export const getSong = async ({ mood }) => {
-  const res = await api.get(`/songs/song?mood=${mood}`);
+  const res = await api.get(`/music/song?mood=${mood}`);
   return res.data;
 };
+
+export const getfav = async () => {
+  const res = await api.get('/songs/fav')
+  return res.data
+}
+export const togglefav = async (songId) => {
+  const res = await api.get(`/songs/fav/${songId}`)
+  return res.data
+}

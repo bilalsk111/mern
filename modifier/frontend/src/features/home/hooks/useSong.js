@@ -10,20 +10,18 @@ export const useSong = () => {
     recommendations,
     setRecommendations,
     loading,
-    setLoading
+    setLoading,
+    isPlaying,
+    setIsPlaying
   } = useContext(SongContext);
 
   const handleGetSong = async (mood) => {
-
-    if (!mood) return;
 
     setLoading(true);
 
     try {
 
-      const data = await getSong({
-        mood: mood.toLowerCase()
-      });
+      const data = await getSong({ mood });
 
       const songs = data.songs || [];
 
@@ -31,6 +29,7 @@ export const useSong = () => {
 
       if (songs.length > 0) {
         setCurrentSong(songs[0]);
+        setIsPlaying(true);
       }
 
     } catch (err) {
@@ -45,11 +44,26 @@ export const useSong = () => {
 
   };
 
-  return {
-    song: currentSong,
-    recommendations,
-    handleGetSong,
-    loading,
-    setSong: setCurrentSong
+  const setSongAndPlay = (song) => {
+
+    setCurrentSong(song);
+    setIsPlaying(true);
+
   };
+
+const togglePlayPause = () => {
+  setIsPlaying(prev => !prev);
+};
+
+  return {
+  song: currentSong,
+  recommendations,
+  handleGetSong,
+  loading,
+  setSong: setCurrentSong,
+  setSongAndPlay,
+  togglePlayPause,
+  isPlaying
+  };
+
 };
