@@ -108,8 +108,8 @@ async function logout(req, res) {
       await redisClient.set(decoded.jti, "blacklisted", { EX: expiry });
     }
 
-    res.clearCookie("token");
-    res.clearCookie("refreshToken");
+    res.clearCookie("token", { httpOnly: true, secure: true, sameSite: "lax", path: "/" });
+    res.clearCookie("refreshToken", { httpOnly: true, secure: true, sameSite: "lax", path: "/" });
     return res.json({ message: "Logged out" });
 
   } catch (error) {

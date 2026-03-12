@@ -5,10 +5,11 @@ import {
   loginUser,
   logoutUser
 } from "../services/auth.api";
+import { useNavigate } from "react-router-dom";
 
 export const useAuth = () => {
   const { user, setUser, loading, setLoading } = useContext(AuthContext);
-
+   const navigate = useNavigate()
   const handleRegister = async (data) => {
     try {
       setLoading(true);
@@ -35,16 +36,18 @@ export const useAuth = () => {
     }
   };
 
-  const handleLogout = async () => {
-    try {
-      setLoading(true);
-      await logoutUser();
-      setUser(null);
-    } finally {
-      setLoading(false);
-    }
-  };
-
+const handleLogout = async () => {
+  setLoading(true);
+  try {
+    await logoutUser();
+    setUser(null);     
+    navigate("/login"); 
+  } catch (err) {
+    console.error("Logout failed", err);
+  } finally {
+    setLoading(false);
+  }
+};
   return {
     user,
     loading,

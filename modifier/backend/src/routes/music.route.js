@@ -1,5 +1,5 @@
 const express = require("express");
-const { getSongsByMood } = require("../controllers/youtube.controller");
+const { getSongsByMood } = require("../controllers/saavn.controller");
 
 const router = express.Router();
 

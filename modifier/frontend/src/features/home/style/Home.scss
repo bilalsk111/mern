@@ -62,28 +62,162 @@
     }
   }
 
-  /* ============================= */
-  /* TOP GRID (BENTO LAYOUT) */
-  /* ============================= */
- .top-grid {
+.top-grid {
   display: grid;
-  grid-template-columns: 3fr 1fr;
+  grid-template-columns: 1.8fr 1.2fr; /* FIXED: Perfect ratio for Scanner and Player */
   gap: 30px;
   align-items: stretch;
   margin-bottom: 40px;
-
-  .scanner-card-wrapper {
-    width: 100%;
-    height: 100%;
-  }
-
-  .player-card {
-    width: 100%;
-    height: 100%;
-  }
 }
 
-  /* CARD BASE */
+.music-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 25px;
+  margin-top: 20px;
+}
+
+.music-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 15px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1);
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.music-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.music-card.is-active {
+  border-color: var(--link-color);
+  box-shadow: 0 0 15px rgba(124, 58, 237, 0.3);
+}
+
+
+.music-card .artwork-area {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.music-card .artwork-area img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.music-card:hover .artwork-area img {
+  transform: scale(1.08);
+}
+
+/* Tags & Buttons inside Image */
+.music-card .artwork-area .mood-tag {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: white;
+  text-transform: uppercase;
+  z-index: 2;
+}
+
+.music-card .artwork-area .favorite-btn {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(8px);
+  border: none;
+  padding: 8px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 3;
+  transition: 0.2s;
+}
+
+.music-card .artwork-area .favorite-btn:hover {
+  background: white;
+}
+
+
+.music-card .artwork-area .interaction-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 2;
+}
+
+.music-card:hover .interaction-overlay,
+.music-card .interaction-overlay.force-visible {
+  opacity: 1;
+}
+
+.music-card .interaction-overlay .main-action {
+  width: 55px;
+  height: 55px;
+  background: var(--link-color);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+  transform: scale(0.8);
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.music-card:hover .interaction-overlay .main-action {
+  transform: scale(1);
+}
+
+
+.music-card .text-area {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.music-card .text-area h4 {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.music-card .text-area .artist-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+  color: var(--dim);
+  font-weight: 500;
+}
+
   .card {
   height: 100%;
     background: var(--card-bg);
@@ -120,7 +254,7 @@
     }
   }
 
-  /* PLAYER SPECIFIC CARD */
+
   .player-card {
     justify-content: space-between;
 
@@ -140,7 +274,7 @@
 
 .song-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
   gap: 20px;
 
   .song-card {
@@ -152,7 +286,6 @@
     background: var(--auth-bg);
     transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1);
 
-    /* Main Image */
     img {
       width: 100%;
       height: 100%;
@@ -160,37 +293,33 @@
       transition: transform 0.5s ease;
     }
 
-    /* Hover Effects */
+  
     &:hover {
       transform: translateY(-8px);
       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
       img { transform: scale(1.1); }
     }
 
-    /* Active State Shadow */
     &.active {
       border: 1px solid var(--link-color);
       box-shadow: 0 0 5px rgba(124, 58, 237, 0.4);
     }
 
-    /* The Dark Gradient over the image */
     .overlay {
       position: absolute;
-      inset: 0; // top, right, bottom, left sab 0
+      inset: 0; 
       background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.3) 50%, transparent 100%);
       display: flex;
       flex-direction: column;
-      justify-content: flex-end; /* Text ko bottom par push karega */
+      justify-content: flex-end; 
       padding: 15px;
-      z-index: 2; /* Important: image ke upar laane ke liye */
+      z-index: 2; 
     }
-
-    /* Typography */
     .song-info {
       h4 {
         font-size: 1.1rem;
         font-weight: 700;
-        color: #ffffff; /* Pure white for title */
+        color: #ffffff;
         margin: 0 0 4px 0;
         white-space: nowrap;
         overflow: hidden;
@@ -200,7 +329,7 @@
       h5 {
         font-size: 0.8rem;
         font-weight: 600;
-        color: var(--link-color); /* Theme color for mood */
+        color: var(--link-color); 
         margin: 0;
         text-transform: uppercase;
         letter-spacing: 1px;
@@ -209,9 +338,6 @@
   }
 }
 
-  /* ============================= */
-  /* LOADING SHIMMER */
-  /* ============================= */
   .loading-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -232,11 +358,6 @@
     100% { background-position: -200% 0; }
   }
 
-  /* ============================= */
-  /* RESPONSIVE DESIGN */
-  /* ============================= */
-
-  /* TABLET */
   @media (max-width: 1100px) {
     .top-grid {
       grid-template-columns: 1.4fr 1fr;
@@ -246,7 +367,6 @@
     }
   }
 
-  /* MOBILE */
   @media (max-width: 768px) {
     padding: 20px;
 
@@ -262,7 +382,7 @@
     }
 
     .player-card {
-      order: 2; // Player shifts below scanner on mobile
+      order: 2;
     }
 
     .scanner-card-wrapper {
@@ -275,13 +395,12 @@
     }
   }
 
-  /* SMALL MOBILE */
   @media (max-width: 480px) {
     .header .header-text h1 {
       font-size: 2rem;
     }
     .song-grid, .loading-grid {
-      grid-template-columns: 1fr; // Single column for very small screens
+      grid-template-columns: 1fr;
     }
   }
 }

@@ -7,119 +7,71 @@ import { useFav } from "../hooks/useFav";
 const Player = () => {
   const { song, isPlaying, togglePlayPause } = useSong();
   const { toggleFav, isFav } = useFav();
-  const playerRef = useRef(null);
+  const audioRef = useRef(null);
 
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
   const [volume, setVolume] = useState(0.5);
 
-  useEffect(() => {
-    if (!song) return;
-
-    const createPlayer = () => {
-      if (playerRef.current && typeof playerRef.current.destroy === "function") {
-        playerRef.current.destroy();
-      }
-      playerRef.current = new window.YT.Player("youtube-player-target", {
-        videoId: song.videoId,
-        playerVars: {
-          autoplay: isPlaying ? 1 : 0,
-          controls: 0,
-          enablejsapi: 1,
-          origin: window.location.origin,
-        },
-        events: {
-          onReady: (event) => {
-            const dur = event.target.getDuration();
-            setDuration(dur);
-            event.target.setVolume(volume * 100);
-            if (isPlaying) {
-              event.target.playVideo();
-            }
-          },
-        },
-      });
-    };
-
-    if (window.YT && window.YT.Player) {
-      createPlayer();
-    } else {
-      const tag = document.createElement("script");
-      tag.src = "https://www.youtube.com/iframe_api";
-      document.body.appendChild(tag);
-      window.onYouTubeIframeAPIReady = createPlayer;
-    }
-
-    return () => {
-      if (playerRef.current && typeof playerRef.current.destroy === "function") {
-        playerRef.current.destroy();
-      }
-    };
-  }, [song]);
 
   useEffect(() => {
-    if (!playerRef.current) return;
-    if (typeof playerRef.current.playVideo !== "function") return;
-
+    if (!audioRef.current) return;
+    
     if (isPlaying) {
-      playerRef.current.playVideo();
+      audioRef.current.play().catch(e => console.log("Autoplay blocked:", e));
     } else {
-      playerRef.current.pauseVideo();
+      audioRef.current.pause();
     }
-  }, [isPlaying]);
+  }, [isPlaying, song]); 
+
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      if (!playerRef.current) return;
-      if (typeof playerRef.current.getCurrentTime !== "function") return;
-      if (isPlaying) {
-        const time = playerRef.current.getCurrentTime();
-        const dur = playerRef.current.getDuration();
+    if (audioRef.current) {
+      audioRef.current.volume = volume;
+    }
+  }, [volume]);
 
-        setCurrentTime(time);
-        setDuration(dur);
+  const handleTimeUpdate = () => {
+    if (!audioRef.current) return;
+    const time = audioRef.current.currentTime;
+    const dur = audioRef.current.duration;
+    
+    setCurrentTime(time);
+    setDuration(dur || 0); // Handle NaN if duration not loaded yet
+    
+    if (dur) setProgress((time / dur) * 100);
+  };
 
-        if (dur) setProgress((time / dur) * 100);
-      }
-    }, 500);
-
-    return () => clearInterval(interval);
-  }, [isPlaying]);
+  const handleLoadedMetadata = () => {
+    if (!audioRef.current) return;
+    setDuration(audioRef.current.duration);
+  };
 
   const seek = (e) => {
-    if (!playerRef.current || typeof playerRef.current.seekTo !== "function") return;
+    if (!audioRef.current) return;
 
     const rect = e.currentTarget.getBoundingClientRect();
     const percent = (e.clientX - rect.left) / rect.width;
     const seekTime = percent * duration;
 
-    playerRef.current.seekTo(seekTime, true);
+    audioRef.current.currentTime = seekTime;
     setProgress(percent * 100);
     setCurrentTime(seekTime);
   };
 
   const skipBackward = () => {
-    if (!playerRef.current || typeof playerRef.current.getCurrentTime !== "function") return;
-    const time = playerRef.current.getCurrentTime();
-    playerRef.current.seekTo(Math.max(time - 5, 0), true);
+    if (!audioRef.current) return;
+    audioRef.current.currentTime = Math.max(audioRef.current.currentTime - 5, 0);
   };
 
   const skipForward = () => {
-    if (!playerRef.current || typeof playerRef.current.getCurrentTime !== "function") return;
-    const time = playerRef.current.getCurrentTime();
-    playerRef.current.seekTo(time + 5, true);
-  };
-
-  const changeVolume = (v) => {
-    setVolume(v);
-    if (playerRef.current && typeof playerRef.current.setVolume === "function") {
-      playerRef.current.setVolume(v * 100);
-    }
+    if (!audioRef.current) return;
+    audioRef.current.currentTime = Math.min(audioRef.current.currentTime + 5, duration);
   };
 
   const format = (t) => {
-    if (!t) return "0:00";
+    if (!t || isNaN(t)) return "0:00";
     const m = Math.floor(t / 60);
     const s = ("0" + Math.floor(t % 60)).slice(-2);
     return `${m}:${s}`;
@@ -132,16 +84,16 @@ const Player = () => {
 
   return (
     <div className="player">
-      <div style={{ display: "none" }}>
-        <div id="youtube-player-target"></div>
-      </div>
-
-      {/* TOP SECTION: Cover & Meta */}
+      <audio 
+        ref={audioRef} 
+        src={song.audioUrl}
+        onTimeUpdate={handleTimeUpdate}
+        onLoadedMetadata={handleLoadedMetadata}
+      />
       <div className="player-left">
         <div className="cover-wrapper">
           <img src={song.posterUrl} alt="cover" className="cover" />
           
-          {/* Heart button mapped properly over image */}
           <button
             className={`favorite-btn ${isLiked ? "liked" : ""}`}
             onClick={(e) => {
@@ -159,8 +111,9 @@ const Player = () => {
 
         <div className="meta">
           <div className="info-text">
-            <p className="title">{song.title}</p>
-            <p className="mood">{song.artist || song.mood}</p>
+            <p className="title">{song.title.slice(0, 20)}</p>
+            <p className="mood">{song.artist}</p>
+            <p>{song.mood}</p>
           </div>
         </div>
       </div>
@@ -181,7 +134,7 @@ const Player = () => {
             <RotateCcw size={22} />
           </button>
           <button className="play" onClick={togglePlayPause}>
-            {isPlaying ? <Pause size={24} fill="currentColor" /> : <Play size={24} fill="currentColor" style={{ marginLeft: "3px" }}/>}
+            {isPlaying ? <Pause size={24} fill="white" /> : <Play size={24} fill="white" style={{ marginLeft: "3px" }}/>}
           </button>
           <button onClick={skipForward}>
             <RotateCw size={22} />
@@ -198,7 +151,7 @@ const Player = () => {
           max="1"
           step="0.01"
           value={volume}
-          onChange={(e) => changeVolume(parseFloat(e.target.value))}
+          onChange={(e) => setVolume(parseFloat(e.target.value))}
         />
       </div>
     </div>

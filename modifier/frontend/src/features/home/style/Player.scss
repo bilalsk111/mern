@@ -1,6 +1,3 @@
-/* =========================================
-   PREMIUM PLAYER DESIGN (MINI CARD)
-========================================= */
 .player {
   background: var(--card-bg);
   backdrop-filter: blur(25px) saturate(180%);
@@ -12,16 +9,14 @@
   justify-content: space-between;
   gap: 25px;
   height: 100%;
-  max-width: 420px;
   width: 100%;
+  /* Let the grid handle the width */
   margin: 0 auto;
   box-shadow: 0 30px 60px rgba(0, 0, 0, 0.2);
   transition: all 0.3s ease;
 }
 
-/* =====================
-   TOP: COVER & META
-===================== */
+/* TOP: COVER & META */
 .player .player-left {
   display: flex;
   flex-direction: column;
@@ -33,8 +28,8 @@
 .player .player-left .cover-wrapper {
   position: relative;
   width: 100%;
-  max-width: 800px;
-  aspect-ratio: 1;
+  max-width: 300px;
+  aspect-ratio: 1 / 1;
   border-radius: 24px;
   overflow: hidden;
   margin: 0 auto;
@@ -54,7 +49,6 @@
 
 /* Favorite Button */
 .player .player-left .cover-wrapper .favorite-btn {
-  
   position: absolute;
   bottom: 15px;
   right: 15px;
@@ -69,8 +63,7 @@
   justify-content: center;
   cursor: pointer;
   z-index: 3;
-  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-
+  transition: all 0.3s ease;
 }
 
 .player .player-left .cover-wrapper .favorite-btn:hover {
@@ -78,14 +71,9 @@
   transform: scale(1.15);
 }
 
-.player .player-left .cover-wrapper .favorite-btn:hover svg {
-  stroke: var(--accent-like);
-  color: var(--accent-like);
-}
-
 .player .player-left .cover-wrapper .favorite-btn.liked {
   background: rgba(255, 255, 255, 0.9);
-  box-shadow: 0 5px 15px rgba(255, 48, 64, 0.3);
+  color: #ff3040;
 }
 
 /* Song Meta */
@@ -107,15 +95,13 @@
 .player .player-left .meta .info-text .mood {
   color: var(--dim);
   font-size: 0.9rem;
-  font-weight: 500;
+  font-weight: 600;
   margin: 0;
   text-transform: uppercase;
   letter-spacing: 1px;
 }
 
-/* =====================
-   CENTER: CONTROLS & PROGRESS
-===================== */
+/* CENTER: CONTROLS & PROGRESS */
 .player .player-center {
   width: 100%;
   display: flex;
@@ -123,7 +109,6 @@
   gap: 20px;
 }
 
-/* Progress Bar */
 .player .player-center .progress-wrapper {
   display: flex;
   align-items: center;
@@ -145,29 +130,22 @@
   cursor: pointer;
   position: relative;
   overflow: hidden;
-  transition: height 0.2s ease;
-}
-
-.player .player-center .progress-wrapper .progress:hover {
-  height: 8px;
 }
 
 .player .player-center .progress-wrapper .progress .progress-fill {
   height: 100%;
   background: var(--link-color);
   border-radius: 10px;
-  box-shadow: 0 0 15px rgba(0, 149, 246, 0.5);
+  box-shadow: 0 0 10px rgba(0, 149, 246, 0.5);
   transition: width 0.1s linear;
 }
 
-/* Player Controls */
 .player .player-center .controls {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 18px;
+  gap: 20px;
   width: 100%;
-  flex-wrap: wrap;
 }
 
 .player .player-center .controls svg {
@@ -178,7 +156,6 @@
 
 .player .player-center .controls svg:hover {
   color: var(--text-main);
-  transform: translateY(-2px);
 }
 
 .player .player-center .controls button {
@@ -190,7 +167,6 @@
   justify-content: center;
 }
 
-/* Play Button */
 .player .player-center .controls .play {
   width: 60px;
   height: 60px;
@@ -198,24 +174,18 @@
   color: #ffffff !important;
   border-radius: 50%;
   box-shadow: 0 10px 25px rgba(0, 149, 246, 0.4);
-  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-.player .player-center .controls .play svg {
-  color: #ffffff;
+  transition: all 0.3s ease;
 }
 
 .player .player-center .controls .play:hover {
   transform: scale(1.1);
-  box-shadow: 0 15px 35px rgba(0, 149, 246, 0.6);
 }
 
-/* Compact Volume Control */
 .player .player-center .controls .volume-control {
   display: flex;
   align-items: center;
   gap: 8px;
-  width: 100px;
+  width: 90px;
   margin-left: 10px;
 }
 
@@ -224,5 +194,4 @@
   height: 4px;
   accent-color: var(--link-color);
   cursor: pointer;
-  border-radius: 10px;
 }

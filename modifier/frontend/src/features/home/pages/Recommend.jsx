@@ -9,16 +9,15 @@ import {
   LayoutGrid,
   BarChart3,
 } from "lucide-react";
-import Player from "../../home/components/Player"; // Player import kiya
+import Player from "../../home/components/Player"; 
 import "../../home/style/Recommend.scss";
 import { useFav } from "../hooks/useFav";
 
 const moods = [
-  "All",
+   "Neutral",
   "Happy",
   "Sad",
   "Calm",
-  "Neutral",
   "Angry",
   "Surprise",
   "Romantic",
@@ -42,21 +41,25 @@ const Recommend = () => {
   const [activeFilter, setActiveFilter] = useState("All");
   const { toggleFav, isFav } = useFav();
 
+  const activeSongId = currentSong?._id || currentSong?.videoId;
+
   useEffect(() => {
     handleGetSong("neutral");
   }, []);
 
   const handleCardClick = (item) => {
-    const isSameSong = currentSong?.videoId === item.videoId;
+    const itemId = item._id || item.videoId;
+    // STRICT CHECK: Dono ID valid honi chahiye aur match karni chahiye
+    const isSameSong = activeSongId && activeSongId === itemId; 
+
     if (isSameSong) {
       togglePlayPause();
     } else {
       setSong(item);
-      if (setIsPlaying) setIsPlaying(true); // Naya song aate hi play karega
+      if (setIsPlaying) setIsPlaying(true); 
     }
   };
 
-  /* FILTER LOGIC */
   const handleFilter = (mood) => {
     setActiveFilter(mood);
     if (mood === "All") {
@@ -68,7 +71,6 @@ const Recommend = () => {
 
   return (
     <div className="recommend-container">
-      {/* HEADER SECTION */}
       <header className="recommend-header">
         <div className="welcome-section">
           <span className="subtitle">AI Curated Picks</span>
@@ -100,7 +102,6 @@ const Recommend = () => {
         </div>
       </header>
 
-      {/* FILTER NAV */}
       <nav className="mood-nav">
         <div className="nav-header">
           <BarChart3 size={16} /> FILTER BY MOOD
@@ -118,7 +119,6 @@ const Recommend = () => {
         </div>
       </nav>
 
-      {/* CONTENT AREA */}
       {loading ? (
         <div className="loader-grid">
           {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
@@ -127,11 +127,13 @@ const Recommend = () => {
         </div>
       ) : (
         <div className="music-grid">
-          {recommendations.map((item) => {
-            const isSelected = currentSong?.videoId === item.videoId;
+          {recommendations.map((item, index) => {
+            const itemId = item._id || item.videoId;
+            const isSelected = activeSongId && activeSongId === itemId;
+
             return (
               <div
-                key={item.videoId}
+                key={itemId || index}
                 className={`music-card ${isSelected ? "is-active" : ""}`}
                 onClick={() => handleCardClick(item)}
               >
@@ -161,14 +163,13 @@ const Recommend = () => {
                     className="favorite-btn"
                     onClick={(e) => {
                       e.stopPropagation();
-                      toggleFav(item); // Pura item pass karein
+                      toggleFav(item); 
                     }}
                   >
                     <Heart
                       size={18}
-                      // FIX: dono me se jo id available ho wo pass karein
-                      color={isFav(item._id || item.videoId) ? "red" : "gray"}
-                      fill={isFav(item._id || item.videoId) ? "red" : "none"}
+                      color={isFav(itemId) ? "red" : "gray"}
+                      fill={isFav(itemId) ? "red" : "none"}
                     />
                   </button>
                 </div>
@@ -176,7 +177,7 @@ const Recommend = () => {
                 <div className="text-area">
                   <h4>{item.title}</h4>
                   <div className="artist-row">
-                    <span>{item.artist}</span>
+                    <span>{item.title.slice(0, 20)}</span>
                     <MoreVertical size={16} className="more-icon" />
                   </div>
                 </div>
@@ -186,7 +187,6 @@ const Recommend = () => {
         </div>
       )}
 
-      {/* FLOATING PLAYER (Only shows when a song is selected) */}
       {currentSong && (
         <div className="floating-player-wrapper">
           <Player />

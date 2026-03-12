@@ -2,7 +2,7 @@ require('dotenv').config()
 const app = require('./src/app')
 const connectToDB = require('./src/config/database')
 const {connectRedis} = require('./src/config/redis')
-PORT = 3000
+PORT = process.env.PORT
 
 connectToDB()
 connectRedis()
