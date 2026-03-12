@@ -118,14 +118,6 @@ const Register = () => {
 
                         <button type='submit' className="btn-primary">Create Account →</button>
                     </form>
-
-                    <div className="divider"><span>Or continue with</span></div>
-
-                    <button type="button" className="btn-google">
-                        <img src="https://imgs.search.brave.com/XkgiaTCt92iT6Xxd3FDAHnEzUssLR_jeCamxvnuv5Rw/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9wbmdp/bWcuY29tL3VwbG9h/ZHMvZ29vZ2xlL3Nt/YWxsL2dvb2dsZV9Q/TkcxOTYzNS5wbmc" alt="Google" width="20" />
-                        Continue with Google
-                    </button>
-
                     <p className="auth-footer">
                         Already have an account? <span className='link' onClick={() => navigate('/login')}>Sign in</span>
                     </p>
