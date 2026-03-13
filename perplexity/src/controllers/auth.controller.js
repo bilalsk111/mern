@@ -1,51 +1,51 @@
+// import 'dotenv/config'
 import userModel from "../models/user.model.js";
 import jwt from "jsonwebtoken"
 import { sendEmail } from "../services/mail.service.js";
 
-export async function register(req, res) {
-    const { username, email, password } = req.body
+export const register = async (req, res) => {
+    const { email, username, password } = req.body;
 
-    const isUserAlreadyExists = await userModel.findOne({
-        $or: [
-            { email }, { username }
-        ]
-    })
-    if (isUserAlreadyExists) {
-        return res.status(400).json({
+    const isAlreadyUserExists = await userModel.findOne({
+        $or: [{ email }, { username }]
+    });
+
+    if (isAlreadyUserExists) {
+        return res.status(401).json({
             message: "User with this email or username already exists",
             success: false,
-            err: "User already exists"
-        })
+            err: "user already exists"
+        });
     }
 
-    const user = await userModel.create({ username, email, password })
+    const user = await userModel.create({ email, username, password });
 
     const emailVerificationToken = jwt.sign({
         email: user.email,
-    }, process.env.JWT_TOKEN)
+    }, process.env.JWT_TOKEN);
 
-    await sendEmail({
-        to: email,
-        subject: "Welcome to Perplexity",
-        html: `
-                    <p>Hi ${username},</p>
-                <p>Thank you for registering at <strong>Perplexity</strong>. We're excited to have you on board!</p>
-                <p>Please verify your email address by clicking the link below:</p>
-                <a href="http://localhost:3000/api/auth/verify-email?token=${emailVerificationToken}">Verify Email</a>
-                <p>If you did not create an account, please ignore this email.</p>
-                <p>Best regards,<br>The Perplexity Team</p>
+    // FIX: Pass arguments individually, not as an object
+    await sendEmail(
+        email, 
+        "Welcome to Perplexity!", 
         `
-    })
+            <p>Hi ${username},</p>
+            <p>Thank you for registering. Please verify your email by clicking below:</p>
+            <a href="http://localhost:3000/api/auth/verify?token=${emailVerificationToken}">Verify Email</a>
+        `,
+        "Welcome to Perplexity! Please verify your email."
+    );
+
     res.status(201).json({
         message: "User registered successfully",
-        success: true,
+        success: false,
         user: {
             id: user._id,
             username: user.username,
             email: user.email
         }
     });
-}
+};
 
 export async function login(req, res) {
     const { email, password } = req.body
