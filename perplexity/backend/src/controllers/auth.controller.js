@@ -80,7 +80,11 @@ export async function login(req, res) {
 
     }, process.env.JWT_TOKEN, { expiresIn: "7d" })
 
-    res.cookie("token", token);
+   res.cookie("token", token, {
+    httpOnly: true, // Security ke liye zaroori hai
+    secure: process.env.NODE_ENV === "production", // Sirf HTTPS pe chalega production mein
+    maxAge: 7 * 24 * 60 * 60 * 1000 // 7 din
+});
     res.status(200).json({
         message: "Login successful",
         success: true,
