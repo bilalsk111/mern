@@ -15,11 +15,13 @@ app.use(cors({
 
 
 import authRouter from "./routes/auth.route.js"
+import chatrouter from "./routes/chat.route.js";
 
 app.get('/',(req,res)=>{
     res.json({message:"server is running"})
 })
 
 app.use('/api/auth',authRouter)
+app.use("/api/chats",chatrouter)
 
 export default app;
