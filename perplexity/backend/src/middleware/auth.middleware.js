@@ -1,9 +1,10 @@
 import jwt from "jsonwebtoken";
+import { redisClient } from "../config/redis.js";
 
 
 
 
-export function authUser(req, res, next) {
+export async function authUser(req, res, next) {
 
     const token = req.cookies.token;
 
@@ -17,6 +18,12 @@ export function authUser(req, res, next) {
     try {
 
        const decoded = jwt.verify(token, process.env.JWT_TOKEN);
+       const isBlacklisted = await redisClient.get(decoded.jti);
+       if(isBlacklisted){
+        return res.status(401).json({
+            message:"Token expired (logged out)"
+        })
+       }
 
         req.user = decoded;
 

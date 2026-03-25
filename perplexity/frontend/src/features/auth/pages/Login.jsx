@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { Link, useNavigate, Navigate } from "react-router-dom"; 
-import { Eye, EyeOff, Mail, Lock, Loader2, AlertTriangle } from "lucide-react";
+import { Eye, EyeOff, Loader2, Sparkles } from "lucide-react";
 import { useAuth } from "../hook/useAuth";
 import { useSelector } from "react-redux";
+import { motion, AnimatePresence } from "framer-motion";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -11,13 +12,13 @@ const Login = () => {
   const [uiError, setUiError] = useState("");
 
   const loading = useSelector(state => state.auth.loading);
-  const user = useSelector(state => state.auth.user);
+  // const user = useSelector(state => state.auth.user);
   
   const { handleLogin } = useAuth();
   const navigate = useNavigate();
 
   const handleCustomSubmit = async (e) => {
-      e?.preventDefault(); // Extra safety
+      e?.preventDefault();
       setUiError(""); 
 
       if (!email || !password) {
@@ -39,88 +40,118 @@ const Login = () => {
       }
   };
 
-  if (user) {
-      return <Navigate to="/" replace />;
-  }
+  // if (user) {
+  //     return <Navigate to="/" replace />;
+  // }
 
   return (
-    <section className="min-h-screen bg-[#050505] flex items-center justify-center px-4 py-10 text-zinc-100">
-      <div className="fixed top-0 left-0 w-full h-full overflow-hidden -z-10">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-[#31b8c6]/10 blur-[120px]" />
-      </div>
+    <main className="min-h-screen w-full flex flex-col justify-center items-center bg-[#000000] selection:bg-white/20 relative overflow-hidden font-sans">
+      <div className="absolute top-0 inset-x-0 h-[500px] pointer-events-none bg-[radial-gradient(ellipse_at_top_center,rgba(255,255,255,0.05)_0%,transparent_70%)]" />
 
-      <div className="w-full max-w-md">
-        <div className="rounded-2xl border border-white/10 bg-zinc-900/40 p-8 shadow-2xl backdrop-blur-md">
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold tracking-tight text-white">Welcome Back</h1>
+      <motion.div 
+        initial={{ opacity: 0, y: 15 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+        className="w-full max-w-[400px] px-5 sm:px-0 z-10"
+      >
+        {/* Logo & Header */}
+        <div className="flex flex-col items-center mb-8">
+          <div className="w-12 h-12 rounded-xl bg-white flex items-center justify-center mb-6 shadow-[0_0_20px_rgba(255,255,255,0.1)]">
+            <Sparkles size={24} className="text-black" />
           </div>
+          <h1 className="text-[28px] font-semibold tracking-tight text-white mb-2">
+            Welcome back
+          </h1>
+          <p className="text-[#a1a1aa] text-[15px]">
+            Log in to your Cognivex account
+          </p>
+        </div>
 
-          <div className="space-y-6">
+        <div className="w-full">
+          <form onSubmit={handleCustomSubmit} className="space-y-4">
             
-            {uiError && (
-              <div className="flex items-start gap-3 rounded-xl bg-red-500/10 border border-red-500/30 p-4 mb-4 text-red-400">
-                <AlertTriangle size={20} className="shrink-0 mt-0.5" />
-                <p className="text-sm font-medium leading-relaxed">{uiError}</p>
-              </div>
-            )}
+            {/* Error Banner */}
+            <AnimatePresence>
+              {uiError && (
+                <motion.div 
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="overflow-hidden"
+                >
+                  <div className="p-3 mb-2 rounded-xl bg-red-500/10 border border-red-500/20 text-[14px] text-red-400 text-center font-medium">
+                    {uiError}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-zinc-300 ml-1">Email Address</label>
-              <div className="relative group">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" size={18} />
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="name@company.com"
-                  className="w-full rounded-xl border border-zinc-800 bg-zinc-950/50 pl-10 pr-4 py-3 text-sm outline-none focus:border-[#31b8c6]/50 transition-colors"
-                />
-              </div>
+            {/* Email Input */}
+            <div className="space-y-1.5">
+              <label className="text-[13px] font-medium text-[#a1a1aa] ml-1">Email address</label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="name@example.com"
+                className="w-full rounded-xl border border-white/[0.08] bg-white/[0.02] px-4 py-3 text-[15px] text-white placeholder:text-zinc-600 outline-none focus:bg-white/[0.04] focus:border-white/20 focus:ring-4 focus:ring-white/[0.02] transition-all"
+                required
+              />
             </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-zinc-300 ml-1">Password</label>
-              <div className="relative group">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" size={18} />
+            {/* Password Input */}
+            <div className="space-y-1.5">
+              <label className="text-[13px] font-medium text-[#a1a1aa] ml-1">Password</label>
+              <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full rounded-xl border border-zinc-800 bg-zinc-950/50 pl-10 pr-12 py-3 text-sm outline-none focus:border-[#31b8c6]/50 transition-colors"
+                  className="w-full rounded-xl border border-white/[0.08] bg-white/[0.02] pl-4 pr-11 py-3 text-[15px] text-white placeholder:text-zinc-600 outline-none focus:bg-white/[0.04] focus:border-white/20 focus:ring-4 focus:ring-white/[0.02] transition-all"
+                  required
                 />
                 <button 
                   type="button" 
                   onClick={() => setShowPassword(!showPassword)} 
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-white transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300 transition-colors p-1"
                 >
-                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
             </div>
 
+            {/* Submit Button */}
             <button
-              type="button"
+              type="submit"
               disabled={loading}
-              onClick={handleCustomSubmit}
-              className="w-full rounded-xl bg-[#31b8c6] px-4 py-3.5 font-bold text-zinc-950 hover:bg-[#45c7d4] disabled:opacity-70 flex justify-center items-center gap-2 transition-all active:scale-[0.98]"
+              className="w-full rounded-xl bg-white text-black px-4 py-3 mt-4 text-[15px] font-semibold hover:bg-zinc-200 active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none flex justify-center items-center gap-2 transition-all shadow-[0_0_15px_rgba(255,255,255,0.1)] hover:shadow-[0_0_20px_rgba(255,255,255,0.15)]"
             >
-              {loading ? <><Loader2 className="animate-spin" size={20} /> Checking...</> : "Sign In"}
+              {loading ? (
+                <>
+                  <Loader2 className="animate-spin text-zinc-500" size={18} /> 
+                  <span className="text-zinc-500">Signing in...</span>
+                </>
+              ) : (
+                "Continue"
+              )}
             </button>
             
-          </div>
+          </form>
+
+          {/* Footer Link */}
           <div className="mt-8 text-center">
-            <p className="text-sm text-zinc-500">
+            <p className="text-[14px] text-zinc-500">
               Don't have an account?{" "}
-              <Link to="/register" className="font-semibold text-[#31b8c6] hover:text-[#45c7d4] transition-colors">
-                Create Account
+              <Link to="/register" className="text-zinc-300 hover:text-white transition-colors font-medium">
+                Sign up
               </Link>
             </p>
           </div>
 
         </div>
-      </div>
-    </section>
+      </motion.div>
+    </main>
   );
 };
 

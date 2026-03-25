@@ -1,6 +1,8 @@
 import userModel from "../models/user.model.js";
 import jwt from "jsonwebtoken";
 import { sendEmail } from "../services/mail.service.js";
+import { redisClient } from "../config/redis.js";
+import { v4 as uuidv4 } from "uuid";
 
 export async function register(req, res) {
     try {
@@ -23,7 +25,7 @@ export async function register(req, res) {
 
         const emailVerificationToken = jwt.sign({
             email: user.email,
-        }, process.env.JWT_TOKEN, { expiresIn: '1d' }); 
+        }, process.env.JWT_TOKEN, { expiresIn: '1d' });
 
         await sendEmail({
             to: email,
@@ -40,7 +42,7 @@ export async function register(req, res) {
 
         res.status(201).json({
             message: "User registered successfully.",
-            success: true, 
+            success: true,
             user: {
                 id: user._id,
                 username: user.username,
@@ -68,12 +70,12 @@ export async function login(req, res) {
     if (!user.verified) {
         return res.status(400).json({ message: "Please verify your email before logging in", success: false });
     }
-
+    const jti = uuidv4()
     const token = jwt.sign({
         id: user._id,
+        jti,
         username: user.username,
-    }, process.env.JWT_TOKEN, { expiresIn: '7d' });
-
+    }, process.env.JWT_TOKEN, { expiresIn: "7d" });
     res.cookie("token", token);
 
     res.status(200).json({
@@ -111,38 +113,52 @@ export async function verifyEmail(req, res) {
 
         user.verified = true;
         await user.save();
+
         const html = `
             <!DOCTYPE html>
             <html lang="en">
             <head>
                 <meta charset="UTF-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>Email Verified</title>
+                <title>Email Verified | Cognivex</title>
                 <script src="https://cdn.tailwindcss.com"></script>
                 <style>
-                    body { background-color: #050505; color: #f4f4f5; margin: 0; }
+                    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+                    body { 
+                        background-color: #000000; 
+                        color: #ffffff; 
+                        font-family: 'Inter', system-ui, sans-serif; 
+                        margin: 0; 
+                        overflow: hidden; 
+                    }
+                    .fade-in-up { 
+                        animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; 
+                    }
+                    @keyframes fadeInUp { 
+                        from { opacity: 0; transform: translateY(20px); } 
+                        to { opacity: 1; transform: translateY(0); } 
+                    }
                 </style>
             </head>
-            <body class="min-h-screen flex items-center justify-center p-4 sm:p-6 font-sans relative overflow-hidden">
-                <div class="absolute top-[-5%] right-[-5%] w-64 h-64 sm:w-96 sm:h-96 rounded-full bg-[#31b8c6]/15 blur-[80px] sm:blur-[120px] -z-10"></div>
-                <div class="absolute bottom-[-5%] left-[-5%] w-64 h-64 sm:w-96 sm:h-96 rounded-full bg-[#31b8c6]/10 blur-[80px] sm:blur-[120px] -z-10"></div>
+            <body class="min-h-screen flex items-center justify-center p-4 sm:p-6 relative selection:bg-white/20">
+                <div class="absolute top-0 inset-x-0 h-[500px] pointer-events-none" style="background: radial-gradient(ellipse at top center, rgba(255,255,255,0.06) 0%, transparent 70%);"></div>
 
-                <div class="max-w-md w-full rounded-2xl border border-white/10 bg-zinc-900/60 p-6 sm:p-8 shadow-2xl backdrop-blur-md text-center z-10 relative">
+                <div class="max-w-[400px] w-full z-10 fade-in-up text-center">
                     
-                    <div class="mx-auto flex h-14 w-14 sm:h-16 sm:w-16 items-center justify-center rounded-full bg-green-500/10 mb-5 sm:mb-6 border border-green-500/30">
-                        <svg class="w-7 h-7 sm:w-8 sm:h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
+                    <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-white/5 mb-6 border border-white/10 shadow-[0_0_30px_rgba(255,255,255,0.05)]">
+                        <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                         </svg>
                     </div>
                     
-                    <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-white mb-2 sm:mb-3">Verified Successfully!</h1>
-                    <p class="text-zinc-400 text-sm sm:text-base mb-6 sm:mb-8 leading-relaxed">
-                        Your email address has been successfully verified. You are now ready to access your account and explore the dashboard.
+                    <h1 class="text-[28px] font-semibold tracking-tight text-white mb-3">Email verified</h1>
+                    <p class="text-[#a1a1aa] text-[15px] mb-8 leading-relaxed">
+                        Your email address has been successfully verified. You can now access your Cognivex account.
                     </p>
                     
                     <a href="http://localhost:5173/login" 
-                       class="inline-flex w-full items-center justify-center rounded-xl bg-[#31b8c6] px-4 py-3 sm:py-3.5 text-sm sm:text-base font-bold text-zinc-950 transition-all hover:bg-[#45c7d4] active:scale-[0.98]">
-                        Continue to Login
+                       class="inline-flex w-full items-center justify-center rounded-xl bg-white px-4 py-3.5 text-[15px] font-semibold text-black transition-all hover:bg-zinc-200 active:scale-[0.98] shadow-[0_0_15px_rgba(255,255,255,0.1)]">
+                        Continue to login
                     </a>
                 </div>
             </body>
@@ -151,31 +167,148 @@ export async function verifyEmail(req, res) {
 
         return res.send(html);
     } catch (err) {
-        
+
+        // 🌟 9/10 Premium Error UI
         const errorHtml = `
             <!DOCTYPE html>
             <html lang="en">
             <head>
                 <meta charset="UTF-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>Verification Failed</title>
+                <title>Verification Failed | Cognivex</title>
                 <script src="https://cdn.tailwindcss.com"></script>
-                <style>body{background:#050505;color:white; margin:0;}</style>
+                <style>
+                    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+                    body { 
+                        background-color: #000000; 
+                        color: #ffffff; 
+                        font-family: 'Inter', system-ui, sans-serif; 
+                        margin: 0; 
+                        overflow: hidden; 
+                    }
+                    .fade-in-up { 
+                        animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; 
+                    }
+                    @keyframes fadeInUp { 
+                        from { opacity: 0; transform: translateY(20px); } 
+                        to { opacity: 1; transform: translateY(0); } 
+                    }
+                </style>
             </head>
-            <body class="min-h-screen flex items-center justify-center p-4 sm:p-6 font-sans relative overflow-hidden">
-                <div class="absolute top-[-5%] right-[-5%] w-64 h-64 sm:w-96 sm:h-96 rounded-full bg-red-500/10 blur-[80px] sm:blur-[120px] -z-10"></div>
+            <body class="min-h-screen flex items-center justify-center p-4 sm:p-6 relative selection:bg-white/20">
+                <div class="absolute top-0 inset-x-0 h-[500px] pointer-events-none" style="background: radial-gradient(ellipse at top center, rgba(239,68,68,0.08) 0%, transparent 70%);"></div>
                 
-                <div class="max-w-md w-full rounded-2xl border border-red-500/20 bg-zinc-900/60 p-6 sm:p-8 text-center shadow-2xl backdrop-blur-md z-10 relative">
-                    <div class="mx-auto flex h-14 w-14 sm:h-16 sm:w-16 items-center justify-center rounded-full bg-red-500/10 mb-5 sm:mb-6 border border-red-500/30">
-                        <svg class="w-7 h-7 sm:w-8 sm:h-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                <div class="max-w-[400px] w-full z-10 fade-in-up text-center">
+                    
+                    <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-red-500/10 mb-6 border border-red-500/20 shadow-[0_0_30px_rgba(239,68,68,0.1)]">
+                        <svg class="w-7 h-7 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
                     </div>
-                    <h1 class="text-2xl sm:text-3xl font-bold text-white mb-2 sm:mb-3">Verification Failed</h1>
-                    <p class="text-zinc-400 text-sm sm:text-base mb-6 sm:mb-8 leading-relaxed">Your verification link is invalid or has expired. Please try registering again to get a new link.</p>
-                    <a href="http://localhost:5173/register" class="inline-block w-full rounded-xl border border-zinc-700 bg-transparent px-4 py-3 sm:py-3.5 text-sm sm:text-base font-semibold text-zinc-300 transition-all hover:bg-zinc-800 hover:text-white">Back to Register</a>
+                    
+                    <h1 class="text-[28px] font-semibold tracking-tight text-white mb-3">Verification failed</h1>
+                    <p class="text-[#a1a1aa] text-[15px] mb-8 leading-relaxed">
+                        Your verification link is invalid or has expired. Please try registering again to get a new link.
+                    </p>
+                    
+                    <a href="http://localhost:5173/register" 
+                       class="inline-flex w-full items-center justify-center rounded-xl bg-white/5 border border-white/10 px-4 py-3.5 text-[15px] font-medium text-white transition-all hover:bg-white/10 active:scale-[0.98]">
+                        Back to register
+                    </a>
                 </div>
             </body>
             </html>
         `;
         return res.status(400).send(errorHtml);
+    }
+}
+
+
+
+// export async function resendVerificationEmail(req, res) {
+//     try {
+//         const { email } = req.body;
+
+//         const user = await userModel.findOne({ email });
+
+//         if (!user) {
+//             return res.status(404).json({
+//                 message: "User not found",
+//             });
+//         }
+
+//         if (user.verified) {
+//             return res.status(400).json({
+//                 message: "User already verified",
+//             });
+//         }
+
+//         // ✅ RATE LIMIT (60s)
+//         if (user.lastEmailSent && Date.now() - user.lastEmailSent < 60000) {
+//             return res.status(429).json({
+//                 message: "Wait before requesting again",
+//             });
+//         }
+
+//         // ✅ TOKEN (USE SAME SECRET + ID)
+//         const token = jwt.sign(
+//             { id: user._id },
+//             process.env.JWT_TOKEN,
+//             { expiresIn: "15m" }
+//         );
+
+//        const verifyLink = `http://localhost:3000/api/auth/verify?token=${token}`;
+
+//         // ✅ UPDATE TIME
+//         user.lastEmailSent = Date.now();
+//         await user.save();
+
+//         // ✅ SEND EMAIL
+//         await sendEmail({
+//             to: user.email,
+//             subject: "Verify your email",
+//             html: `
+//         <h3>Email Verification</h3>
+//         <p>Click below to verify your account:</p>
+//         <a href="${verifyLink}">Verify Email</a>
+//       `,
+//         });
+
+//         res.json({
+//             success: true,
+//             message: "Verification email resent successfully",
+//         });
+
+//     } catch (err) {
+//         console.error(err);
+//         res.status(500).json({
+//             message: "Something went wrong",
+//         });
+//     }
+// }
+export async function logout(req, res) {
+    try {
+        const token = req.cookies.token;
+
+        if (!token) {
+            return res.status(400).json({ message: "No token provided" });
+        }
+
+        const decoded = jwt.decode(token);
+
+        if (!decoded?.jti) {
+            return res.status(400).json({ message: "Invalid token" });
+        }
+
+        const expiry = decoded.exp - Math.floor(Date.now() / 1000);
+
+        await redisClient.set(decoded.jti, "revoked", { EX: expiry });
+
+        res.clearCookie("token");
+
+        res.status(200).json({ message: "Logged out successfully" });
+
+    } catch (err) {
+        res.status(500).json({ message: "Logout failed" });
     }
 }

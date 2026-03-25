@@ -10,9 +10,16 @@ export async function register({ email, username, password }) {
     const response = await api.post("/api/auth/register", { email, username, password })
     return response.data
 }
-
+export async function resendVerification(email) {
+  const res = await api.post("/api/auth/resend-verification", { email });
+  return res.data;
+}
 export async function login({ email, password }) {
     const response = await api.post("/api/auth/login", { email, password })
+    return response.data
+}
+export async function logout() {
+    const response = await api.post("/api/auth/logout")
     return response.data
 }
 

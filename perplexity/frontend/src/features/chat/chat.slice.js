@@ -42,10 +42,21 @@ const chatSlice = createSlice({
         localStorage.setItem("currentChatId", action.payload);
       }
     },
-    updateChatTitle: (state, action) => {
-      const { chatId, title } = action.payload;
-      if (state.chats[chatId]) state.chats[chatId].title = title;
-    },
+ updateChatTitle: (state, action) => {
+  const { chatId, title } = action.payload;
+
+  if (!state.chats[chatId]) {
+    state.chats[chatId] = {
+      id: chatId,
+      title: "New Chat",
+      messages: [],
+    };
+  }
+
+  if (title && title.trim()) {
+    state.chats[chatId].title = title;
+  }
+},
     addMessages: (state, action) => {
       const { chatId, messages } = action.payload;
       if (state.chats[chatId]) state.chats[chatId].messages = messages;

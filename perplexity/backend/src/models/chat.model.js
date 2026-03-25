@@ -12,6 +12,7 @@ const chatSchema = new mongoose.Schema(
             default: 'New Chat',
             trim: true,
         },
+        summary: String,
     },
     { timestamps: true }
 );

@@ -31,6 +31,12 @@ export function useChat() {
     dispatch(setStreaming(true));
 
     try {
+ if (!chatId && message) {
+  dispatch(updateChatTitle({
+    chatId: tempChatId,
+    title: "Thinking...",
+  }));
+}
       const response = await sendMessage({ message, chatId, file });
       const realChatId = response.chatId;
 
@@ -56,12 +62,12 @@ export function useChat() {
         dispatch(updateChatTitle({ chatId: realChatId, title: response.chat.title }));
       }
 
-      if (response.aiMessage) {
-        dispatch(replacePlaceholderWithReal({
-          chatId: chatId || realChatId,
-          realMessage: response.aiMessage,
-        }));
-      }
+      const finalChatId = chatId || realChatId;
+
+dispatch(replacePlaceholderWithReal({
+  chatId: finalChatId,
+  realMessage: response.aiMessage,
+}));
     } catch (err) {
       console.error("Send message error:", err);
       dispatch(removeAIPlaceholder({ chatId: tempChatId }));
