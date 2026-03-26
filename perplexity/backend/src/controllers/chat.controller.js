@@ -18,7 +18,7 @@ export async function sendmessage(req, res) {
 
     let chat;
 
-    // ✅ find chat
+    // 1. Find Chat
     if (chatId && mongoose.Types.ObjectId.isValid(chatId)) {
       chat = await chatModel.findOne({
         _id: chatId,
@@ -27,16 +27,12 @@ export async function sendmessage(req, res) {
     }
 
     const isNewChat = !chat;
-
-    // ✅ create chat
     if (!chat) {
       chat = await chatModel.create({
         user: req.user.id,
-       title: "New Chat",
+        title: "New Chat",
       });
     }
-
-    // ✅ file upload
     let fileData = {};
     if (req.file) {
       const uploaded = await uploadFile({
@@ -52,92 +48,86 @@ export async function sendmessage(req, res) {
       };
     }
 
-    // ✅ save user message
+    // 4. Save User Message
+    const userMessageContent = message || (fileData.fileUrl ? "Please analyze this file." : "");
     const userMessage = await messageModel.create({
       chat: chat._id,
-      content: message || (fileData.fileUrl ? "Analyze this file" : ""),
+      content: userMessageContent,
       role: "user",
-      ...fileData,
+      ...fileData, // Ensure fileUrl and fileType are saved to DB
     });
 
-    // 🔥 SAVE MEMORY (SAFE)
+    // 5. Memory Management
     if (message) {
       await saveMemory(req.user.id, message);
     }
 
-    // 🔥 GET MEMORY
     const memory = await userMemoryModel.findOne({
       userId: req.user.id,
     });
-
     const memoryText = memory?.facts?.join("\n") || "";
 
-    // 🔥 GET CHAT SUMMARY (if exists)
-    const chatData = await chatModel.findById(chat._id);
-
-    // 🔥 FETCH MESSAGES
+    // 6. Fetch Previous Messages
     const messages = await messageModel
       .find({ chat: chat._id })
       .sort({ createdAt: 1 })
       .lean();
 
-    // 🔥 BUILD FINAL AI CONTEXT
     const finalMessages = [
       {
         role: "system",
-        content: "You are a helpful AI assistant.",
-      },
-      {
-        role: "system",
-        content: `User memory:\n${memoryText}`,
-      },
-      {
-        role: "system",
-        content: chatData?.summary || "",
+        content: `You are a helpful AI assistant. User memory: ${memoryText}`,
       },
       ...messages.map((m) => ({
         role: m.role,
         content: m.content,
+        fileUrl: m.fileUrl,
+        fileType: m.fileType,
+        fileName: m.fileName
       })),
     ];
 
     const io = getIO();
+    let fullResponse = "";
 
-    // 🔥 STREAM AI RESPONSE
-    let full = "";
+    // 8. Stream Response and wait for it to finish
+    // We pass the onChunk callback to send real-time socket events
+    fullResponse = await geminiairesponse(
+      finalMessages, 
+      (chunk) => {
+        io.to(chat._id.toString()).emit(`stream-${chat._id}`, chunk);
+      },
+      { userName: req.user?.username || "User" } 
+    );
 
-    await geminiairesponse(finalMessages, (chunk) => {
-      full += chunk;
-      io.to(chat._id.toString()).emit(`stream-${chat._id}`, chunk);
-    });
-
-    // ✅ save AI message
+    // 9. Save AI Message
     const aiMessage = await messageModel.create({
       chat: chat._id,
-      content: full,
+      content: fullResponse,
       role: "ai",
     });
-if (chat.title === "New Chat") {
-  const newTitle = await chatTitle(
-    (message || "") + " " + full.slice(0, 50)
-  );
 
-  chat.title = newTitle || message?.slice(0, 30) || "New Chat";
-  await chat.save();
-}
-    // 🔥 OPTIONAL: update summary every 10 msgs
-    if (messages.length % 10 === 0) {
-      const summary = await summarizeChat(messages);
-
-      await chatModel.findByIdAndUpdate(chat._id, {
-        summary,
-      });
+    // 10. Title Generation
+    if (chat.title === "New Chat") {
+      const newTitle = await chatTitle(
+        (message || "File Analysis") + " " + fullResponse.slice(0, 50)
+      );
+      chat.title = newTitle || message?.slice(0, 30) || "New Chat";
+      await chat.save();
     }
 
+    // 11. Summarize old chats
+    if (messages.length > 0 && messages.length % 10 === 0) {
+      const summary = await summarizeChat(messages);
+      await chatModel.findByIdAndUpdate(chat._id, { summary });
+    }
+
+    // 12. Final Socket Emit
     io.to(chat._id.toString()).emit(`stream-done-${chat._id}`, {
       aiMessageId: aiMessage._id,
     });
 
+    // 13. Send HTTP Response
     res.json({
       chatId: chat._id,
       isNewChat,
@@ -145,6 +135,7 @@ if (chat.title === "New Chat") {
       userMessage,
       aiMessage,
     });
+
   } catch (err) {
     console.error("sendmessage error:", err);
     res.status(500).json({
@@ -154,7 +145,6 @@ if (chat.title === "New Chat") {
   }
 }
 
-// Get all chats of logged-in user
 export async function getChats(req, res) {
   try {
     const chats = await chatModel

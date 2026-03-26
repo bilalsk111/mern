@@ -167,8 +167,6 @@ export async function verifyEmail(req, res) {
 
         return res.send(html);
     } catch (err) {
-
-        // 🌟 9/10 Premium Error UI
         const errorHtml = `
             <!DOCTYPE html>
             <html lang="en">

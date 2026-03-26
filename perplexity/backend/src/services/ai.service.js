@@ -8,14 +8,15 @@ import {
 } from "@langchain/core/messages";
 import { emailTool } from "../tools/email.tool.js";
 import { searchTool } from "../tools/search.tool.js";
+import { buildSystemPrompt } from "../tools/systemPrompt.js";
 import axios from "axios";
 import sharp from "sharp";
-import * as z from "zod";
 
-const MAX_MESSAGES = 20;
+const MAX_MESSAGES = 20; // Last 20 messages are enough, no need to summarize
 const MAX_TOOL_ITERATIONS = 2;
 
-// Initialize primary Gemini model for advanced tasks like images and complex reasoning
+// ================= MODELS =================
+
 const geminiFlash = new ChatGoogleGenerativeAI({
   model: "gemini-2.5-flash",
   apiKey: process.env.GEMINI_API_KEY,
@@ -23,47 +24,70 @@ const geminiFlash = new ChatGoogleGenerativeAI({
   maxOutputTokens: 8192,
 });
 
-// Lightweight fallback Gemini model to handle quota limits or failures
 const geminiLite = new ChatGoogleGenerativeAI({
   model: "gemini-2.0-flash-lite",
   apiKey: process.env.GEMINI_API_KEY,
   temperature: 0.7,
-  maxOutputTokens: 8192,
+  maxOutputTokens: 4096,
 });
 
-// Fast and cost-efficient text model
 const mistral = new ChatMistralAI({
   model: "mistral-small-latest",
   apiKey: process.env.MISTRAL_API_KEY,
-  temperature: 1.0,
+  temperature: 0.7,
 });
+
+// ================= TOOLS =================
 
 const toolsMap = {
   search_internet: searchTool,
   send_email: emailTool,
 };
+
 const mistralWithTools = mistral.bindTools([searchTool, emailTool]);
 const geminiWithTools = geminiFlash.bindTools([searchTool, emailTool]);
 
-// Convert image URL into optimized base64 for AI processing
+// ================= HELPERS =================
+
 async function imageUrlToBase64(url) {
   const res = await axios.get(url, {
     responseType: "arraybuffer",
-    timeout: 10000,
+    timeout: 15000,
+    headers: { "User-Agent": "Mozilla/5.0" },
   });
-  const buffer = await sharp(Buffer.from(res.data))
-    .resize({ width: 1024 })
+
+  return sharp(Buffer.from(res.data))
+    .resize({ width: 1024, withoutEnlargement: true })
     .jpeg({ quality: 80 })
-    .toBuffer();
-  return buffer.toString("base64");
+    .toBuffer()
+    .then((buf) => buf.toString("base64"));
 }
 
-// Detect API quota errors
 function isQuotaError(err) {
-  return err?.status === 429 || err?.message?.includes("quota");
+  return (
+    err?.status === 429 ||
+    err?.status === 404 ||
+    err?.message?.includes("429") ||
+    err?.message?.includes("quota") ||
+    err?.message?.includes("not found")
+  );
 }
 
-// Convert DB messages into AI-compatible format
+function detectMode(messages) {
+  const last = messages[messages.length - 1]?.content?.toLowerCase() || "";
+  if (/\b(error|bug|fix|crash|exception|traceback)\b/.test(last)) return "debug";
+  if (/\b(code|function|api|class|component|implement|write a)\b/.test(last)) return "coding";
+  if (/\b(explain|what is|how does|why does|difference between)\b/.test(last)) return "explain";
+  if (/\b(solve|calculate|math|equation|formula|proof)\b/.test(last)) return "math";
+  if (/\b(write|story|poem|essay|creative|blog|copy)\b/.test(last)) return "creative";
+  if (/\b(research|analyze|compare|report|summary of)\b/.test(last)) return "research";
+  return "chat";
+}
+
+// SPEED FIX 1: Removed summarizeOldMessages completely. It was adding massive latency.
+
+// ================= FORMAT MESSAGES =================
+
 async function formatMessages(messages = []) {
   const formatted = [];
 
@@ -83,16 +107,25 @@ async function formatMessages(messages = []) {
           type: "image_url",
           image_url: { url: `data:image/jpeg;base64,${base64}` },
         });
-      } catch {
-        parts.push({ type: "text", text: "Image failed to load" });
+      } catch (err) {
+        parts.push({
+          type: "text",
+          text: `[Image could not be loaded: ${msg.fileName || "unknown"}]`,
+        });
       }
 
-      formatted.push(new HumanMessage({ content: parts }));
+      formatted.push(
+        parts.length === 1 && parts[0].type === "text"
+          ? new HumanMessage(parts[0].text)
+          : new HumanMessage({ content: parts })
+      );
       continue;
     }
 
     if (msg.fileUrl && msg.fileType?.includes("pdf")) {
-      formatted.push(new HumanMessage(`[PDF: ${msg.fileName}] ${msg.fileUrl}`));
+      const text = (msg.content ? msg.content + "\n\n" : "") +
+        `[PDF Document: "${msg.fileName || "document.pdf"}" — URL: ${msg.fileUrl}. Please analyze this document carefully.]`;
+      formatted.push(new HumanMessage(text));
       continue;
     }
 
@@ -102,7 +135,8 @@ async function formatMessages(messages = []) {
   return formatted;
 }
 
-// Executes AI tool calls in loop with limit control
+// ================= TOOL LOOP =================
+
 async function runToolLoop(history, useGemini = false) {
   const model = useGemini ? geminiWithTools : mistralWithTools;
   let count = 0;
@@ -111,7 +145,7 @@ async function runToolLoop(history, useGemini = false) {
     let res;
     try {
       res = await model.invoke(history);
-    } catch {
+    } catch (err) {
       break;
     }
 
@@ -124,17 +158,11 @@ async function runToolLoop(history, useGemini = false) {
         if (!toolFn) return null;
         try {
           const result = await toolFn.invoke(call.args);
-          return new ToolMessage({
-            content: String(result),
-            tool_call_id: call.id,
-          });
+          return new ToolMessage({ content: String(result), tool_call_id: call.id });
         } catch {
-          return new ToolMessage({
-            content: "Tool failed",
-            tool_call_id: call.id,
-          });
+          return new ToolMessage({ content: "Tool failed", tool_call_id: call.id });
         }
-      }),
+      })
     );
 
     history.push(...results.filter(Boolean));
@@ -142,83 +170,101 @@ async function runToolLoop(history, useGemini = false) {
   }
 }
 
-// Summarizes old conversation to reduce token usage
-async function summarizeOldMessages(messages) {
-  const text = messages.map((m) => m.content).join("\n");
-  const res = await mistral.invoke([
-    new SystemMessage("Summarize conversation briefly"),
-    new HumanMessage(text),
-  ]);
-  return res.content;
-}
+// ================= MAIN =================
 
-// Main AI response pipeline
-export async function geminiairesponse(messages, onChunk) {
-  if (!Array.isArray(messages)) return "Invalid input";
+export async function geminiairesponse(messages, onChunk, options = {}) {
+  if (!Array.isArray(messages) || !messages.length) return "⚠️ Invalid input.";
 
-  const recent = messages.slice(-10);
-  const old = messages.slice(0, -10);
+  // SPEED FIX 1: Only format the last 20 messages. Do not run parallel summarization.
+  const formatted = await formatMessages(messages);
 
-  let summary = "";
-  if (old.length) summary = await summarizeOldMessages(old);
+  if (!formatted.length) return "⚠️ No valid messages to process.";
 
-  const formatted = await formatMessages(recent);
+  const hasImage = messages.some((m) => m.fileUrl && !m.fileType?.includes("pdf"));
+  const hasPDF = messages.some((m) => m.fileType?.includes("pdf"));
+  const needsGemini = hasImage || hasPDF;
 
-  const history = [
-    new SystemMessage("You are a helpful AI assistant"),
-    new SystemMessage(`Previous context: ${summary}`),
-    ...formatted,
-  ];
+  const mode = options.mode || detectMode(messages);
 
-  const hasImage = messages.some(
-    (m) => m.fileUrl && !m.fileType?.includes("pdf"),
-  );
-  const needsGemini = hasImage;
+  const systemPrompt = buildSystemPrompt({
+    mode,
+    hasImage,
+    hasPDF,
+    userName: options.userName || null,
+    language: "auto",
+  });
+
+  const history = [new SystemMessage(systemPrompt), ...formatted];
+
+  // SPEED FIX 2: Smart Tool Trigger
+  // Sirf tabhi tool loop chalao agar user ke message me search/email se related words hon
+  const lastUserMsg = messages[messages.length - 1]?.content?.toLowerCase() || "";
+  const needsTools = /\b(search|find|email|send|mail|look up)\b/.test(lastUserMsg);
 
   let stream;
 
   try {
     if (needsGemini) {
-      await runToolLoop(history, true);
-      stream = await geminiFlash.stream(history);
+      // Run tool loop ONLY if explicitly needed
+      if (needsTools) {
+        await runToolLoop(history, true).catch(() => {});
+      }
+
+      try {
+        stream = await geminiFlash.stream(history);
+      } catch (err) {
+        if (isQuotaError(err)) {
+          stream = await geminiLite.stream(history);
+        } else {
+          throw err;
+        }
+      }
     } else {
-      await runToolLoop(history, false);
-      stream = await mistral.stream(history);
+      // Text only path
+      if (needsTools) {
+        await runToolLoop(history, false).catch(() => {});
+      }
+
+      try {
+        stream = await mistral.stream(history);
+      } catch (err) {
+        stream = await geminiFlash.stream(history);
+      }
     }
   } catch (err) {
-    if (isQuotaError(err)) return "Rate limited, try later";
-    return "AI error";
+    console.error("AI Error:", err.message);
+    return "⚠️ AI is temporarily unavailable. Please try again.";
   }
 
   let full = "";
-  let buffer = "";
-
-  for await (const chunk of stream) {
-    const text = chunk?.content || "";
-    buffer += text;
-    full += text;
-
-    if (buffer.length > 50) {
-      onChunk?.(buffer);
-      buffer = "";
-    }
-  }
-
-  if (buffer) onChunk?.(buffer);
-
-  return full || "No response";
-}
-
-// Generate short chat title using AI
-export async function chatTitle(message) {
-  if (!message) return "New Chat";
 
   try {
+    for await (const chunk of stream) {
+      const text = chunk?.content || "";
+      if (!text) continue;
+
+      full += text;
+      
+      // SPEED FIX 3: Buffer hata diya gaya hai. Word generate hote hi turant frontend par jayega.
+      onChunk?.(text); 
+    }
+  } catch (err) {
+    if (!full) return "⚠️ Stream interrupted. Please try again.";
+  }
+
+  return full || "⚠️ No response generated.";
+}
+
+// ================= TITLE GENERATION =================
+
+export async function chatTitle(message) {
+  if (!message?.trim()) return "New Chat";
+  try {
     const res = await mistral.invoke([
-      new SystemMessage("Generate short title"),
-      new HumanMessage(message.slice(0, 100)),
+      new SystemMessage("Generate a short, descriptive chat title (3-5 words max). Return ONLY the title."),
+      new HumanMessage(message.slice(0, 200)),
     ]);
-    return res.content.trim();
+    return res.content?.replace(/['"]/g, "").trim() || "New Chat";
   } catch {
     return "New Chat";
   }
