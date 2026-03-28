@@ -23,17 +23,8 @@
   .logo-section {
     padding: 25px 12px;
     margin-bottom: 10px;
-
-    .logo-full {
-      font-size: 24px;
-      font-weight: 700;
-      color: var(--text-main);
-    }
-
-    .logo-icon {
-      display: none;
-      color: var(--text-main);
-    }
+    .logo-full { font-size: 24px; font-weight: 700; color: var(--text-main); }
+    .logo-icon { display: none; color: var(--text-main); }
   }
 
   .nav-links {
@@ -51,55 +42,30 @@
       border-radius: 8px;
       transition: all 0.2s;
 
-      span {
-        font-size: 16px;
-      }
-
-      &:hover {
-        background: var(--hover-bg);
-      }
-
-      &:active {
-        transform: scale(0.96);
-      }
+      span { font-size: 16px; }
+      &:hover { background: var(--hover-bg); }
+      &:active { transform: scale(0.96); }
 
       &.active {
-        span {
-          font-weight: 700;
-        }
-
-        svg {
-          stroke-width: 3px;
-        }
+        span { font-weight: 700; }
+        svg { stroke-width: 3px; }
       }
     }
   }
 
   .more-btn {
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    color: var(--text-main);
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    padding: 12px;
-    border-radius: 8px;
-
-    &:hover {
-      background: var(--hover-bg);
-    }
+    background: transparent; border: none; cursor: pointer;
+    color: var(--text-main); display: flex; align-items: center;
+    gap: 16px; padding: 12px; border-radius: 8px;
+    &:hover { background: var(--hover-bg); }
   }
 }
 
-/* MOBILE HEADER */
 .mobile-header {
-  display: none;
+  display: none; // Hidden on Desktop
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: var(--header-height-mobile);
+  top: 0; left: 0; right: 0;
+  height: 48px; // Standard IG header height
   background: var(--card-bg);
   border-bottom: 1px solid var(--input-border);
   z-index: 1001;
@@ -107,50 +73,44 @@
   align-items: center;
   justify-content: space-between;
 
-  .logo {
-    font-size: 25px;
-    font-weight: 700;
-    color: var(--text-main);
-    font-family: Arial, Helvetica, sans-serif;
+  .logo { 
+    font-family: 'Instagram Sans', sans-serif; 
+    font-size: 22px; 
+    font-weight: 700; 
+    color: var(--text-main); 
   }
 
   .header-actions {
     display: flex;
-    gap: 18px;
-    color: var(--text-main);
+    align-items: center;
+    gap: 16px;
+
+    .header-icon-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      padding: 4px;
+      
+      &:active { transform: scale(0.9); }
+    }
   }
 }
-
-
+// Tablet: Shrink to icons
 @media (max-width: 1263px) and (min-width: 768px) {
   .sidebar {
     width: 72px;
-
-    .logo-full,
-    span {
-      display: none;
-    }
-
-    .logo-icon {
-      display: block;
-      margin: 0 auto;
-    }
-
-    .nav-links a,
-    .more-btn {
-      justify-content: center;
-      padding: 12px 0;
-    }
+    .logo-full, span { display: none; }
+    .logo-icon { display: block; margin: 0 auto; }
+    .nav-links a, .more-btn { justify-content: center; padding: 12px 0; }
   }
 }
 
 // Phone: Bottom Navigation
 @media (max-width: 767px) {
-  .mobile-header {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
+  .mobile-header { display: flex; }
 
   .sidebar {
     width: 100%;
@@ -162,16 +122,11 @@
     border-right: none;
     border-top: 1px solid var(--input-border);
 
-    .logo-section,
-    .bottom-section,
-    .hide-on-mobile,
-    span {
+    .logo-section, .bottom-section, .hide-on-mobile, span {
       display: none;
     }
 
-    .top-section {
-      width: 100%;
-    }
+    .top-section { width: 100%; }
 
     .nav-links {
       flex-direction: row;
@@ -186,10 +141,7 @@
         height: 100%;
         justify-content: center;
         border-radius: 0;
-
-        &:hover {
-          background: transparent;
-        }
+        &:hover { background: transparent; }
       }
     }
   }

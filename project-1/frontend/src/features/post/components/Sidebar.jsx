@@ -1,7 +1,13 @@
 import { NavLink } from "react-router-dom";
 import {
-  Home, Compass, PlusSquare, User,
-  Bookmark, Search, LogOut, Instagram
+  Home,
+  Compass,
+  PlusSquare,
+  User,
+  Bookmark,
+  Search,
+  LogOut,
+  Instagram,
 } from "lucide-react";
 import { useContext, useState } from "react";
 import { AuthContext } from "../../auth/auth.context";
@@ -18,6 +24,14 @@ const Sidebar = () => {
     <>
       <div className="mobile-header">
         <div className="logo">Instagram</div>
+        <div className="header-actions">
+          <button
+            onClick={() => setLogoutOpen(true)}
+            className="header-icon-btn"
+          >
+            <LogOut size={22} />
+          </button>
+        </div>
       </div>
 
       <div className="sidebar">
