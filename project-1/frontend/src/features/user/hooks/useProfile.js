@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { getProfile } from "../services/user.api";
+import { getProfile, updateProfile as updateProfileAPI } from "../services/user.api";
 
 const profileCache = {};
 
@@ -13,10 +13,14 @@ export const useProfile = (username) => {
   });
 
   const [loading, setLoading] = useState(true);
+  const [updateLoading, setUpdateLoading] = useState(false);
+  const [error, setError] = useState(null);
   const fetching = useRef(false);
 
+  // ✅ FETCH PROFILE
   useEffect(() => {
     if (!username) return;
+
     if (profileCache[username]) {
       setProfileState(profileCache[username]);
       setLoading(false);
@@ -41,10 +45,10 @@ export const useProfile = (username) => {
         };
 
         profileCache[username] = profileData;
-
         setProfileState(profileData);
+
       } catch (err) {
-        console.error("Profile fetch error:", err);
+        setError("Failed to load profile");
       } finally {
         setLoading(false);
         fetching.current = false;
@@ -54,9 +58,44 @@ export const useProfile = (username) => {
     fetchProfile();
   }, [username]);
 
+const updateProfile = async (formData) => {
+    try {
+      setUpdateLoading(true);
+      const res = await updateProfileAPI(formData);
+      const updatedUser = res.user;
+
+      // 1. Update local state immediately
+      setProfileState((prev) => ({
+        ...prev,
+        profileUser: updatedUser,
+      }));
+
+      // 2. IMPORTANT: Update the Cache
+      // If username changed, delete the old cache entry
+      if (username !== updatedUser.username) {
+        delete profileCache[username];
+      }
+      
+      // Update/Create cache for the new/current username
+      profileCache[updatedUser.username] = {
+        ...profileState,
+        profileUser: updatedUser,
+      };
+
+      return updatedUser;
+    } catch (err) {
+       // ... handle error
+    } finally {
+      setUpdateLoading(false);
+    }
+  };
+
   return {
     ...profileState,
     setProfileState,
     loading,
+    updateLoading,
+    updateProfile,
+    error,
   };
 };

@@ -3,6 +3,7 @@ let ImageKit = require('@imagekit/nodejs/index.js')
 let { toFile } = require('@imagekit/nodejs/index.js')
 const likeModel = require('../models/like.model')
 const saveModel = require("../models/save.model");
+const Follow = require('../models/follow.model')
 const Comment = require('../models/comment.model');
 const userModel = require('../models/user.model');
 
@@ -137,6 +138,7 @@ async function GetFeed(req, res) {
       .sort({ createdAt: -1 });
 
     const postIds = posts.map((p) => p._id);
+    const userIds = [...new Set(posts.map((p) => p.user._id.toString()))];
 
     const likes = await likeModel.find({
       post: { $in: postIds },
@@ -147,9 +149,14 @@ async function GetFeed(req, res) {
       post: { $in: postIds },
       user: userId,
     });
+    const following = await Follow.find({
+      follower: userId,
+      followee: { $in: userIds }
+    });
 
     const likedSet = new Set(likes.map((l) => l.post.toString()));
     const savedSet = new Set(saves.map((s) => s.post.toString()));
+    const followingSet = new Set(following.map((f) => f.followee.toString()));
 
     const finalPosts = await Promise.all(
       posts.map(async (post) => {
@@ -162,12 +169,17 @@ async function GetFeed(req, res) {
           totalLikes,
           isLiked: likedSet.has(post._id.toString()),
           isSaved: savedSet.has(post._id.toString()),
+          user: {
+            ...post.user.toObject(),
+            isFollowing: followingSet.has(post.user._id.toString())
+          }
         };
       })
     );
 
     res.json({ posts: finalPosts });
-  } catch {
+  } catch (error) {
+    console.error(error);
     res.status(500).json({ message: "Server error" });
   }
 }

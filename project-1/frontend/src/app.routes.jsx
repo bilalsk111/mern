@@ -8,6 +8,7 @@ import Profile from './features/user/pages/Profile'
 import MainLayout from './features/post/MainLayout'
 import Protected from './features/components/Protected'
 import Reels from './features/post/pages/Reels'
+import UserSearch from './features/post/pages/UserSearch'
 
 export const router = createBrowserRouter([
   {
@@ -27,6 +28,10 @@ export const router = createBrowserRouter([
       {
         path: 'reels',
         element: <Reels />
+      },
+      {
+        path: 'search',
+        element: <UserSearch />
       },
       {
         path: 'save',

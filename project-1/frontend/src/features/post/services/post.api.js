@@ -25,10 +25,10 @@ export const createPost = async (formData) => {
   return res.data;
 };
 //REELS
-export const getReels = async () => {
-  const res = await api.get("/posts/reels");
-  return res.data;
-};
+// export const getReels = async () => {
+//   const res = await api.get("/posts/reels");
+//   return res.data;
+// };
 // DELETE
 export const deletePost = async (id) => {
   const res = await api.delete(`/posts/${id}`);
@@ -41,6 +41,6 @@ export const toggleSavePost = async (id) => {
   return res.data;
 };
 export const getSavedPosts = async () => {
-  const res = await api.get("/posts/saves"); // FIXED
+  const res = await api.get("/posts/saves"); 
   return res.data;
 };

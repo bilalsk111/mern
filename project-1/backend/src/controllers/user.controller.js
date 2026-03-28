@@ -7,7 +7,7 @@ const postModel = require('../models/post.model');
 
 
 const imagekit = new ImageKit({
-    privateKey: process.env.IMAGEKIT_PRIVATE_KEY
+  privateKey: process.env.IMAGEKIT_PRIVATE_KEY
 })
 
 async function followUser(req, res) {
@@ -19,8 +19,6 @@ async function followUser(req, res) {
     if (!targetUser) {
       return res.status(404).json({ message: "User not found" });
     }
-
-    // prevent self follow
     if (targetUser._id.toString() === followerId) {
       return res.status(400).json({ message: "You cannot follow yourself" });
     }
@@ -118,7 +116,6 @@ async function getFollowers(req, res) {
     return res.status(500).json({ message: error.message });
   }
 }
-// FIXED getFollowing
 async function getFollowing(req, res) {
   try {
     const { username } = req.params;
@@ -163,7 +160,6 @@ async function getProfile(req, res) {
 
     let isFollowing = false;
 
-    // ✅ SAFE CHECK
     if (req.user && req.user.id) {
       const existing = await Follow.findOne({
         follower: req.user.id,
@@ -182,41 +178,87 @@ async function getProfile(req, res) {
     });
 
   } catch (error) {
-    console.error("GET PROFILE ERROR:", error); // <-- IMPORTANT
+    console.error("GET PROFILE ERROR:", error);
     res.status(500).json({ message: error.message });
   }
 }
 
 async function updateProfile(req, res) {
 
-    let userId = req.user.id
-    let { name, bio } = req.body
+  let userId = req.user.id
+  let { name, bio, username } = req.body
 
-    let uploadData = { name, bio }
-    if (req.file) {
-
-        let uploadfile = await imagekit.files.upload({
-            file: await toFile(req.file.buffer, req.file.originalname),
-            fileName: `profileimage-${Date.now()}.jpg`,
-            folder: 'insta-clone'
-        })
-
-        uploadData.profileImage = uploadfile.url
+  let updateData = { name, bio }
+  if (username) {
+    const existingUser = await userModel.findOne({ username })
+    if (existingUser && existingUser._id.toString() !== userId) {
+      return res.status(400).json({ message: "Username already taken" });
     }
+    updateData.username = username
+  }
+
+  if (req.file) {
+    const uploadfile = await imagekit.files.upload({
+      file: await toFile(req.file.buffer, req.file.originalname),
+      fileName: `profileimage-${Date.now()}.jpg`,
+      folder: "insta-clone",
+    });
+
+    updateData.profileImage = uploadfile.url;
+  }
 
 
-    let user = await userModel.findByIdAndUpdate(
-        userId,
-        uploadData,
-        { returnDocument: 'after' }
-    ).select('-password')
+  let user = await userModel.findByIdAndUpdate(userId, updateData, {
+    new: true,
+    runValidators: true,
+  })
 
-    res.json({
-        message: "Profile updated successfully",
-        user
-    })
+  res.json({
+    message: "Profile updated successfully",
+    user
+  })
 }
 
+async function checkUsernameAvailability(req, res) {
+  try {
+    let { username } = req.query;
+
+    if (!username || username.trim().length < 3) {
+      return res.status(400).json({
+        available: false,
+        message: "Username must be at least 3 characters",
+      });
+    }
+
+    username = username.trim().toLowerCase();
+
+    const existingUser = await userModel.findOne({ username });
+
+    if (existingUser) {
+      return res.json({
+        available: false,
+        message: "Username already taken",
+        suggestions: [
+          username + "123",
+          username + "_official",
+          username + Date.now().toString().slice(-3),
+        ],
+      });
+    }
+
+    return res.json({
+      available: true,
+      message: "Username is available",
+    });
+
+  } catch (error) {
+    console.error("Username check error:", error);
+    return res.status(500).json({
+      available: false,
+      message: "Server error",
+    });
+  }
+}
 
 // async function acceptFollow(req, res) {
 //     try {
@@ -271,13 +313,50 @@ async function updateProfile(req, res) {
 //         return res.status(500).json({ message: "Internal server error" });
 //     }
 // }
+async function searchUsers(req,res) {
+    try {
+    const q = req.query.q?.trim();
 
+    if (!q || q.length < 2) {
+      return res.status(200).json({
+        success: true,
+        data: [],
+      });
+    }
+
+    const users = await userModel.find({
+      $or: [
+        { username: { $regex: q, $options: "i" } },
+        { name: { $regex: q, $options: "i" } },
+      ],
+    })
+      .select("_id username name profileImage")
+      .limit(10);
+
+    return res.status(200).json({
+      success: true,
+      data: users,
+    });
+
+  } catch (error) {
+    console.error("Search Users Error:", error);
+
+    return res.status(500).json({
+      success: false,
+      data: [],
+      message: "Server error",
+    });
+  }
+
+}
 
 module.exports = {
-    followUser,
-    unfollowUser,
-    updateProfile,
-    getProfile,
-    getFollowers,
-   getFollowing
+  followUser,
+  unfollowUser,
+  updateProfile,
+  getProfile,
+  getFollowers,
+  getFollowing,
+  checkUsernameAvailability,
+ searchUsers
 };

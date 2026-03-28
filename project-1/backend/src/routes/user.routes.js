@@ -10,7 +10,9 @@ let {
     updateProfile,
     getProfile,
     getFollowers,
-    getFollowing
+    getFollowing,
+    checkUsernameAvailability,
+    searchUsers
 } = require('../controllers/user.controller')
 
 let multer = require('multer');
@@ -29,8 +31,10 @@ userRouter.get("/profile/:username", authMiddleware, getProfile);
 userRouter.put(
     "/profile",
     authMiddleware,
-    upload.single("profile"),  
+    upload.single("profileImage"),  
     updateProfile
 );
+userRouter.get('/checkUser',checkUsernameAvailability)
+userRouter.get("/search", searchUsers);
 
 module.exports = userRouter

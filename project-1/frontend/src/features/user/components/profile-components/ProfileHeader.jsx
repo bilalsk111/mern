@@ -8,68 +8,57 @@ const ProfileHeader = ({
   followingCount = 0,
   isOwnProfile,
   isFollowing = false,
-  followLoading=false,
-   onFollowClick,
+  onFollowClick,
+  onEditClick,
 }) => {
   if (!profileUser) return null;
 
   const { name = "—", username = "", profileImage, bio = "" } = profileUser;
-
-  const avatarSrc = profileImage || "/default-avatar.png";
-  const displayUsername = username ? `@${username}` : "";
+  const avatarSrc     = profileImage || "/default-avatar.png";
+  const displayHandle = username ? `@${username}` : "";
 
   return (
-    <header className="profile-header">
-      <div className="profile-avatar-section">
-        <img
-          src={avatarSrc}
-          alt={`${name} profile avatar`}
-          className="profile-avatar"
-          loading="lazy"
-        />
+    <header className="ph">
+      {/* Avatar */}
+      <div className="ph__avatar-wrap">
+        <img src={avatarSrc} alt={name} className="ph__avatar" loading="lazy" />
       </div>
 
-      <div className="profile-info-section">
-        <div className="profile-top-row">
-          <div className="profile-name-block">
-            <h2 className="profile-name">{name}</h2>
-            {displayUsername && (
-              <p className="profile-username">{displayUsername}</p>
-            )}
-          </div>
+      {/* Right side */}
+      <div className="ph__info">
 
-           {isOwnProfile ? (
-          <button className="edit-btn">
-            Edit Profile
-          </button>
-        ) : (
-          <button
-            className={`follow-btn ${isFollowing ? "following" : ""}`}
-            onClick={onFollowClick} 
-            disabled={followLoading}
-          >
-            {followLoading
-              ? "Please wait..."
-              : isFollowing
-              ? "Unfollow"
-              : "Follow"}
-          </button>
-        )}
+        {/* Row 1: username + buttons */}
+        <div className="ph__row1">
+          <h2 className="ph__username">{username || name}</h2>
+
+          {isOwnProfile ? (
+            <button className="ph__btn ph__btn--edit" onClick={onEditClick}>
+              Edit profile
+            </button>
+          ) : (
+            <button
+              className={`ph__btn ${isFollowing ? "ph__btn--unfollow" : "ph__btn--follow"}`}
+              onClick={onFollowClick}
+            >
+              {isFollowing ? "Following" : "Follow"}
+            </button>
+          )}
         </div>
 
+        {/* Row 2: stats */}
         <ProfileStats
           postsCount={postsCount}
           followersCount={followersCount}
           followingCount={followingCount}
         />
 
-        {bio && (
-          <div className="profile-bio">
-            <p>{bio}</p>
-          </div>
-        )}
+        {/* Row 3: name + bio */}
+        {name && <p className="ph__name">{name}</p>}
+        {bio   && <p className="ph__bio">{bio}</p>}
       </div>
+      
     </header>
+
   );
 };
 

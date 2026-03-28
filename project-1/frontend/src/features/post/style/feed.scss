@@ -1,269 +1,357 @@
-.feed-page {
+/* ═══════════════════════════════════════
+   Instagram-grade Post Component
+═══════════════════════════════════════ */
+
+.ig-post {
+  max-width: 470px;
+  width: 100%;
+  margin: 0 auto;
+  padding-bottom: 0;
+  border-bottom: 1px solid var(--input-border);
+
+  /* ── HEADER ── */
+  &__header {
     display: flex;
-    justify-content: center;
-    min-height: 100vh;
-    background-color: var(--auth-bg);
-    color: var(--text-main);
-    padding-top: 20px;
-
-    .feed {
-        max-width: 470px;
-        width: 100%;
-
-        .post {
-            width: 100%;
-            margin-bottom: 16px; // Increased spacing
-             border-bottom: 1px solid var(--input-border);
-
-            .post-header {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                padding: 8px 4px;
-
-                .user {
-                    display: flex;
-                    align-items: center;
-                    gap: 12px;
-
-                    .img-wrapper {
-                        width: 34px; // Slightly larger
-                        height: 34px;
-                        border-radius: 50%;
-                        background: var(--story-gradient);
-                        padding: 2px;
-                        cursor: pointer;
-
-                        img {
-                            width: 100%;
-                            height: 100%;
-                            border-radius: 50%;
-                            border: 2px solid var(--auth-bg);
-                            object-fit: cover;
-                        }
-                    }
-
-                        .username {
-                        font-size: 14px;
-                        font-weight: 600;
-                        color: var(--text-main);
-                        text-decoration: none;
-                        cursor: pointer;
-                        &:hover { color: var(--icon-color); }
-                    }
-                }
-
-                // Transparent Delete Button
-                .delete-icon-btn {
-                    background: transparent; // Request: transparent bg
-                    border: none;
-                    cursor: pointer;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    padding: 8px;
-                    border-radius: 50%;
-                    transition: background 0.2s ease;
-
-                    &:hover {
-                        background: rgba(255, 48, 64, 0.1); // Subtle red tint on hover
-                    }
-
-                    svg {
-                        transition: transform 0.2s ease;
-                    }
-
-                    &:active svg {
-                        transform: scale(0.9);
-                    }
-                }
-            }
-
-                .media-container {
-                position: relative;
-                width: 100%;
-                 background: var(--card-bg);
-                display: flex;
-                align-items: center;
-                min-height: 300px;
-                border-radius: 8px; // Modern touch
-                border: 0.5px solid var(--input-border);
-                overflow: hidden;
-
-                .post-media {
-                    width: 100%;
-                    max-height: 585px;
-                    object-fit: contain;
-                }
-            }
-
-            .interaction-area {
-                padding: 12px 0;
-
-                .icons {
-                    display: flex;
-                    justify-content: space-between;
-                    margin-bottom: 8px;
-
-                    .left {
-                        display: flex;
-                        gap: 16px;
-                        align-items: center;
-                    }
-
-                    button {
-                        background: transparent;
-                        border: none;
-                        color: var(--text-main);
-                        cursor: pointer;
-                        padding: 4px;
-                        display: flex;
-                        align-items: center;
-                        border-radius: 50%;
-                        transition: opacity 0.2s;
-
-                        &:hover { opacity: 0.7; }
-
-                        svg {
-                            width: 24px;
-                            height: 24px;
-                            transition: transform 0.1s;
-
-                            &:active { transform: scale(1.2); }
-
-                            &.filled {
-                                fill: var(--accent-like);
-                                stroke: var(--accent-like);
-                            }
-                        }
-
-                        // Specific style for share icon
-                        &.share-btn {
-                            svg {
-                                transform: rotate(-20deg); // Real Insta tilt
-                                margin-bottom: 2px;
-                            }
-                        }
-                    }
-                }
-
-                .likes-count {
-                    font-size: 14px;
-                    font-weight: 600;
-                    margin-bottom: 6px;
-                    padding-left: 4px;
-                }
-
-                .caption-section {
-                    font-size: 14px;
-                    line-height: 1.5;
-                    padding-left: 4px;
-
-                    .username {
-                        font-weight: 600;
-                        margin-right: 6px;
-                    }
-                }
-            }
-        }
-    }
-}
-
-// Save button specific logic
-.save-btn {
-    svg.saved {
-        fill: var(--btn-text) !important;
-    }
-}
-
-.media-container {
-    position: relative; // Crucial for overlay positioning
-    width: 100%;
-    display: flex;
-    justify-content: center;
     align-items: center;
-     background: var(--auth-bg);
+    gap: 10px;
+    padding: 10px 12px 10px 12px;
+  }
 
-    .heart-overlay {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        z-index: 10;
-        pointer-events: none; // Allows clicks to pass through
-        animation: heartPop 0.8s ease-out forwards;
+  /* Avatar with gradient ring */
+  &__avatar-wrap {
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+    padding: 2px;
+    display: block;
+    text-decoration: none;
+  }
 
-        svg {
-            width: 80px;
-            height: 80px;
-            filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.4));
-        }
-    }
-}
-.menu-wrapper {
-    position: relative;
-}
+  &__avatar {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--bg-main, #fff);
+    display: block;
+  }
 
-.menu-btn {
-    background: transparent;
+  /* Username + Follow + time */
+  &__meta {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1px;
+    min-width: 0;
+  }
+
+  &__meta-top {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: nowrap;
+    min-width: 0;
+  }
+
+  &__username {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--text-main);
+    text-decoration: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    &:hover { opacity: 0.8; }
+  }
+
+  &__sep {
+    color: #8e8e8e;
+    font-size: 11px;
+    flex-shrink: 0;
+  }
+
+  &__follow-inline {
+    background: none;
     border: none;
-    font-size: 20px;
+    color: #0095f6;
+    font-weight: 600;
+    font-size: 13.5px;
+    cursor: pointer;
+    padding: 0;
+    flex-shrink: 0;
+    &:hover { color: #00376b; }
+  }
+
+  &__time {
+    font-size: 12px;
+    color: #8e8e8e;
+    line-height: 1;
+  }
+
+  /* More (⋯) button */
+  &__more-wrap { position: relative; flex-shrink: 0; }
+
+  &__more-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-main);
+    display: flex;
+    align-items: center;
+    padding: 4px;
+    border-radius: 50%;
+    &:hover { background: rgba(0,0,0,0.04); }
+  }
+
+  /* ── Instagram-style bottom sheet dropdown ── */
+  &__overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 98;
+  }
+
+  &__sheet {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    width: 260px;
+    background: var(--card-bg, #fff);
+    border-radius: 14px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.18);
+    z-index: 99;
+    overflow: hidden;
+    animation: sheetIn 0.18s ease;
+  }
+
+  &__sheet-btn {
+    display: block;
+    width: 100%;
+    padding: 14px 16px;
+    background: none;
+    border: none;
+    border-bottom: 1px solid var(--input-border);
+    color: var(--text-main);
+    font-size: 14px;
+    text-align: center;
+    cursor: pointer;
+    font-weight: 400;
+    transition: background 0.15s;
+
+    &:last-child { border-bottom: none; }
+    &:hover { background: rgba(0,0,0,0.04); }
+    &.danger {
+      color: #ed4956;
+      font-weight: 700;
+    }
+  }
+
+  /* ── MEDIA ── */
+  &__media {
+    position: relative;
+    width: 100%;
+    background: #000;
+    overflow: hidden;
+    /* Square by default like Instagram, adjust as needed */
+    aspect-ratio: 1 / 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__media-el {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* fills perfectly, no black bars */
+    display: block;
+  }
+
+  &__video-wrap {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+  }
+
+  /* Play overlay */
+  &__play-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+  }
+
+  &__play-circle {
+    width: 68px;
+    height: 68px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: popIn 0.2s ease;
+  }
+
+  /* Mute button */
+  &__mute-btn {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 5;
+    transition: background 0.2s;
+    &:hover { background: rgba(0, 0, 0, 0.75); }
+  }
+
+  /* Double-tap heart */
+  &__heart-burst {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 10;
+    animation: heartBurst 0.9s ease-out forwards;
+    filter: drop-shadow(0 2px 16px rgba(255,48,64,0.45));
+  }
+
+  /* ── ACTIONS ── */
+  &__actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 12px 4px 8px;
+  }
+
+  &__actions-left {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  &__action-btn {
+    background: none;
+    border: none;
     cursor: pointer;
     color: var(--text-main);
     padding: 6px;
-}
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: transform 0.1s, opacity 0.15s;
 
-.menu-dropdown {
-    position: absolute;
-    right: 0;
-    top: 30px;
-    background: var(--card-bg);
-    border: 1px solid var(--input-border);
-    border-radius: 8px;
-    overflow: hidden;
-    z-index: 20;
-    min-width: 120px;
-    animation: fadeIn 0.2s ease;
-}
+    &:hover { opacity: 0.6; }
+    &:active { transform: scale(0.88); }
 
-.menu-dropdown button {
-    width: 100%;
-    padding: 10px;
-    background: transparent;
-    border: none;
+    /* Like pop */
+    &.pop svg {
+      animation: likePop 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+    }
+
+    &--send {
+      svg { transform: rotate(-20deg) translateY(-1px); }
+    }
+  }
+
+  /* ── DETAILS ── */
+  &__details {
+    padding: 4px 12px 14px;
+  }
+
+  &__likes {
+    font-size: 14px;
+    font-weight: 600;
     color: var(--text-main);
-    text-align: left;
+    margin: 0 0 6px;
+  }
+
+  &__caption {
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--text-main);
+    margin: 0 0 6px;
+    word-break: break-word;
+  }
+
+  &__cap-user {
+    font-weight: 700;
+    color: var(--text-main);
+    text-decoration: none;
+    margin-right: 2px;
+    &:hover { opacity: 0.7; }
+  }
+
+  &__more-caption {
+    background: none;
+    border: none;
+    color: #8e8e8e;
+    font-size: 14px;
     cursor: pointer;
-    transition: background 0.2s;
+    padding: 0;
+    font-weight: 400;
+  }
+
+  &__view-comments {
+    background: none;
+    border: none;
+    padding: 0;
+    color: #8e8e8e;
+    font-size: 14px;
+    cursor: pointer;
+    display: block;
+    margin-bottom: 4px;
+    &:hover { color: var(--text-main); }
+  }
+
+  &__timestamp {
+    font-size: 10px;
+    letter-spacing: 0.4px;
+    color: #8e8e8e;
+    margin: 4px 0 0;
+    text-transform: uppercase;
+  }
 }
 
-.menu-dropdown button:hover {
-    background: rgba(255,255,255,0.05);
+/* ── KEYFRAMES ── */
+@keyframes heartBurst {
+  0%   { transform: translate(-50%, -50%) scale(0);    opacity: 0; }
+  15%  { transform: translate(-50%, -50%) scale(1.3);  opacity: 1; }
+  35%  { transform: translate(-50%, -50%) scale(1.0);  opacity: 1; }
+  80%  { transform: translate(-50%, -50%) scale(1.0);  opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(1.5);  opacity: 0; }
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-5px);}
-    to { opacity: 1; transform: translateY(0);}
+@keyframes likePop {
+  0%   { transform: scale(1); }
+  25%  { transform: scale(1.5); }
+  50%  { transform: scale(0.9); }
+  75%  { transform: scale(1.15); }
+  100% { transform: scale(1); }
 }
-@keyframes heartPop {
-    0% {
-        transform: translate(-50%, -50%) scale(0);
-        opacity: 0;
-    }
-    15% {
-        transform: translate(-50%, -50%) scale(1.2);
-        opacity: 0.9;
-    }
-    30% {
-        transform: translate(-50%, -50%) scale(1);
-        opacity: 1;
-    }
-    80% {
-        transform: translate(-50%, -50%) scale(1);
-        opacity: 1;
-    }
-    100% {
-        transform: translate(-50%, -50%) scale(1.5);
-        opacity: 0;
-    }
+
+@keyframes sheetIn {
+  from { opacity: 0; transform: translateY(-8px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0)    scale(1); }
+}
+
+@keyframes popIn {
+  from { opacity: 0; transform: scale(0.6); }
+  to   { opacity: 1; transform: scale(1); }
 }

@@ -11,6 +11,7 @@
   --focus-border: #a8a8a8;
   --btn-text: #ffffff;
   --story-gradient: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+  --card: #f1efef;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -27,5 +28,6 @@
     --focus-border: #5a5a5a;
     --btn-text: #ffffff;
     --story-gradient: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
-  }
+     --card: #1d1d1d;
+}
 }

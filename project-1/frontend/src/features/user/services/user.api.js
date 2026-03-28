@@ -10,6 +10,23 @@ export const getProfile = async (username) => {
   const res = await api.get(`/profile/${username}`);
   return res.data;
 };
+export const searchUsersAPI = async (query, signal) => {
+  const res = await api.get("/search", {
+    params: { q: query },
+    signal,
+  });
+
+  return res.data;
+};
+
+export const updateProfile = async (data) => {
+  const res = await api.put("/profile", data,{
+    headers: {
+      "Content-Type": "multipart/form-data",
+    }
+  });
+  return res.data;
+  }
 
 // FOLLOW REQUEST
 export const followUser = async (username) => {
