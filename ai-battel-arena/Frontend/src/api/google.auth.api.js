@@ -4,7 +4,7 @@
  * Login redirects to backend. Logout is purely client-side (JWT is stateless).
  */
 
-const BASE_URL = "http://localhost:3000";
+const BASE_URL = "https://arenapro.onrender.com";
 
 /** Redirects browser to Google OAuth flow */
 export function loginWithGoogle() {

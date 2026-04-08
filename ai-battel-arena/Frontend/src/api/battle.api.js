@@ -3,7 +3,7 @@
  * Centralized API calls. Every request attaches the JWT from localStorage.
  */
 
-const BASE_URL = "http://localhost:3000";
+const BASE_URL = "https://arenapro.onrender.com";
 
 /** Returns the Authorization header object, throws if no token found */
 function authHeaders() {
