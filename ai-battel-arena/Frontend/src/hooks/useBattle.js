@@ -86,7 +86,7 @@ export function useBattle() {
     const text = (customInput || input).trim();
     if (!text) return;
 
-    setPendingQuestion(text); // ✅ shown in skeleton immediately
+    setPendingQuestion(text);
     setInput("");
     setLoading(true);
     setActiveBattle(null);

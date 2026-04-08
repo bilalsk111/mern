@@ -16,7 +16,11 @@ app.use(express.json());
 app.use(passport.initialize());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'))
-app.use(express.static('./public'));
+app.use(cors({
+  origin: true, 
+  credentials: true, 
+}))
+app.use(express.static("./public"))
 // ─── Auth ─────────────────────────────────────────────────────────────────────
 
 app.get("/auth/google",
@@ -31,7 +35,7 @@ app.get("/auth/google/callback",
     const token = jwt.sign(
       {
         userId: user._id,
-        name: user.name,        // ✅ FIX: was user.displayname (typo) → user.name
+        name: user.name,  
         email: user.email,
         avatar: user.avatar,
       },
