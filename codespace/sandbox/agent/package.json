@@ -1,5 +1,5 @@
 {
-  "name": "router",
+  "name": "agent",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -14,7 +14,6 @@
   "license": "ISC",
   "dependencies": {
     "express": "^5.2.1",
-    "http-proxy-middleware": "^4.0.0",
     "morgan": "^1.10.1"
   },
   "devDependencies": {

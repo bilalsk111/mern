@@ -1,9 +1,9 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: router-deployment
+  name:  router-deployment
   labels:
-    name: router-deployment
+    name:  router-deployment
 spec:
   replicas: 1
   selector:
@@ -36,7 +36,7 @@ spec:
             path: /api/status/readyz
             port: 3000
           initialDelaySeconds: 30
-          timeoutSeconds: 10      
+          timeoutSeconds: 10     
         ports:
         - containerPort:  3000
           name:  main-router

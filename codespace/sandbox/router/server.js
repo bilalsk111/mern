@@ -1,7 +1,6 @@
-import app from "./src/app.js";
-
+import app from './src/app.js';
 const PORT = 3000;
 
-app.listen(PORT, () => {
-  console.log(`Sandbox server is running on port ${PORT}`);
+app.listen(PORT,'0.0.0.0', () => {
+    console.log(`Router is running on port ${PORT}`);
 });
