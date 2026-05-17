@@ -20,7 +20,7 @@ function getProxy(sandboxId) {
       target,
       changeOrigin: true,
       ws: true,
-      pathRewrite: { "^/": "/" },
+      // pathRewrite: { "^/": "/" },
       logLevel: "debug",
       onError: (err, req, res) => {
         res.status(502).send("Vite Frontend not reachable.");
@@ -38,7 +38,7 @@ function getAgentProxy(sandboxId) {
       target,
       changeOrigin: true,
       ws: true,
-      pathRewrite: { "^/": "/" },
+      // pathRewrite: { "^/": "/" },
       logLevel: "debug",
       onError: (err, req, res) => {
         res.status(502).send("Agent API not reachable.");
@@ -51,23 +51,25 @@ function getAgentProxy(sandboxId) {
 // 2. ROUTING MIDDLEWARE
 app.use((req, res, next) => {
   const host = req.headers.host || "";
-  const sandboxId = host.split(".")[0];
+  // Strip port: "019e35a5.agent.localhost:3001" → "019e35a5.agent.localhost"
+  const hostname = host.split(":")[0];
+  const parts = hostname.split(".");
 
-  // Orchestrator API bypass
+  // parts[0] = sandboxId, parts[1] = "agent" | "preview", parts[2] = "localhost"
+  const sandboxId = parts[0];
+  const routeType = parts[1]; // "agent" or "preview"
+
   if (req.path.startsWith("/api/sandbox")) {
     return next();
   }
 
-  // Safe checks using includes instead of exact array indexing
-  if (sandboxId && !["preview", "agent", "localhost", "api"].includes(sandboxId) && isNaN(sandboxId)) {
-    
-    // 1. Agar URL mein '.agent.' aata hai, toh Agent service (Port 3000) par bhejo
-    if (host.includes(".agent.")) {
+  const excluded = ["preview", "agent", "localhost", "api"];
+  if (sandboxId && !excluded.includes(sandboxId) && isNaN(sandboxId)) {
+    if (routeType === "agent") {
+      console.log("Routing to Agent for sandbox:", sandboxId);
       return getAgentProxy(sandboxId)(req, res, next);
     }
-    
-    // 2. Agar URL mein '.preview.' aata hai, toh Vite (Port 80) par bhejo
-    if (host.includes(".preview.")) {
+    if (routeType === "preview") {
       return getProxy(sandboxId)(req, res, next);
     }
   }
